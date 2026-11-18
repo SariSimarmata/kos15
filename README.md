@@ -8,11 +8,11 @@ Aplikasi web responsif untuk mengelola kos dengan 19 kamar: katalog kamar, pemes
 
 | Nama     | Peran             |
 | -------- | ----------------- |
-| <Nama 1> | <Ketua / Backend> |
-| <Nama 2> | <Frontend>        |
-| <Nama 3> | <...>             |
-| <Nama 4> | <...>             |
-| <Nama 5> | <...>             |
+| Sari Y.  |                   |
+| Bibahh   |                   |
+| Piaa     |                   |
+| Piqaa    |                   |
+| Enjel    |                   |
 
 ---
 
