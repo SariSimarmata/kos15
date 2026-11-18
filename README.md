@@ -1,69 +1,136 @@
-# CodeIgniter 4 Application Starter
+# Kos 15 – Sistem Informasi Manajemen Kos dan Pembayaran Otomatis
 
-## What is CodeIgniter?
+Aplikasi web responsif untuk mengelola kos dengan 19 kamar: katalog kamar, pemesanan, tagihan, pembayaran QRIS/tunai, piket, pengunjung menginap, dan laporan kerusakan.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+**Tech stack:** CodeIgniter 4 · PHP 8.2 · MySQL · Git/GitHub
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+## Anggota Kelompok
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+| Nama     | Peran             |
+| -------- | ----------------- |
+| <Nama 1> | <Ketua / Backend> |
+| <Nama 2> | <Frontend>        |
+| <Nama 3> | <...>             |
+| <Nama 4> | <...>             |
+| <Nama 5> | <...>             |
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+---
 
-## Installation & updates
+## 1. Cara Menjalankan Proyek
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+Syarat: PHP 8.2 (ekstensi `intl`, `mbstring`, `mysqlnd`, `curl`), Composer, Git, MySQL/MariaDB.
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+```bash
+git clone https://github.com/SariSimarmata/kos15.git
+cd kos15
+composer install
+copy .env.example .env      # Windows (Mac/Linux: cp)
+```
 
-## Setup
+1. Buat database kosong bernama `kos15` di phpMyAdmin.
+2. Buka `.env`, sesuaikan username dan password MySQL di laptop masing-masing.
+3. Jalankan server:
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+```bash
+php spark serve
+```
 
-## Important Change with index.php
+4. Buka http://localhost:8080. Jika halaman selamat datang CI4 tampil, proyek berjalan.
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+> `.env` berisi pengaturan pribadi dan **tidak boleh di-commit**.
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+---
 
-**Please** read the user guide for a better explanation of how CI4 works!
+## 2. Aturan Git
 
-## Repository Management
+1. **Satu kartu = satu cabang.** Format: `fitur/<nama-kartu>`
+   Contoh: `fitur/katalog-kamar`, `fitur/login-register`
+2. Jangan commit langsung ke `main`. Semua perubahan lewat **Pull Request**.
+3. **Commit kecil dan sering**, dengan pesan jelas:
+   - `feat:` fitur baru → `feat: tambah halaman katalog kamar`
+   - `fix:` perbaikan bug → `fix: perbaiki validasi nomor HP`
+   - `docs:` dokumentasi, `chore:` konfigurasi
+4. **Pull sebelum push:** `git pull origin main`
+5. **`.env` dilarang di-commit.** Pakai `.env.example`.
+6. Dilarang `git push --force`. Kalau ada konflik, tanya di grup.
+7. Pull Request di-review minimal satu anggota lain sebelum merge.
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Alur kerja harian:
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+```bash
+git checkout main
+git pull origin main
+git checkout -b fitur/nama-kartu
+# ...kerja, lalu...
+git add .
+git commit -m "feat: deskripsi singkat"
+git pull origin main
+git push -u origin fitur/nama-kartu
+# buka Pull Request di GitHub
+```
 
-## Server Requirements
+---
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+## 3. Aturan Penamaan
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+| Hal        | Aturan                                          | Contoh                                |
+| ---------- | ----------------------------------------------- | ------------------------------------- |
+| Tabel      | Sama persis dengan ERD, huruf kecil, snake_case | `pengguna`, `tagihan_bulanan`         |
+| Kolom      | Sama persis dengan kamus data                   | `id_sewa`, `status_tagihan`           |
+| Controller | PascalCase                                      | `KatalogKamar`, `Pemesanan`           |
+| Model      | PascalCase + `Model`                            | `KamarModel`, `TagihanModel`          |
+| Route      | Huruf kecil, tanda hubung                       | `katalog-kamar`, `riwayat-pembayaran` |
+| View       | Huruf kecil, satu folder per fitur              | `katalog/index.php`                   |
+| Cabang Git | `fitur/...` atau `perbaikan/...`                | `fitur/katalog-kamar`                 |
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+> Jangan mengganti nama tabel/kolom di tengah jalan tanpa kesepakatan kelompok, karena memicu konflik dan pengerjaan ulang.
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+---
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+## 4. Nilai ENUM (sesuai Kamus Data)
+
+| Tabel.kolom                          | Nilai                                                        |
+| ------------------------------------ | ------------------------------------------------------------ |
+| `pengguna.role`                      | `calon_penghuni`, `penghuni`, `pemilik`                      |
+| `kamar.status_kamar`                 | `kosong`, `terisi`                                           |
+| `media_kamar.jenis`                  | `foto`, `video`                                              |
+| `pemesanan.status_pengajuan`         | `pending`, `approved`, `rejected`                            |
+| `sewa.status_sewa`                   | `menunggu_pembayaran`, `aktif`, `selesai`, `dibatalkan`      |
+| `pengajuan_perpanjangan.status`      | `menunggu`, `disetujui`, `ditolak`                           |
+| `tagihan.jenis_tagihan`              | `dp`, `pelunasan`, `tagihan_bulanan`, `denda_piket`          |
+| `tagihan.status_tagihan`             | `belum_bayar`, `lunas`, `dibatalkan`                         |
+| `pembayaran.metode`                  | `qris`, `tunai`                                              |
+| `pembayaran.status_pembayaran`       | `menunggu`, `berhasil`, `kedaluwarsa`, `gagal`, `ditolak`    |
+| `piket.status_piket`                 | `terjadwal`, `menunggu_verifikasi`, `selesai`, `tidak_piket` |
+| `laporan_kerusakan.status_perbaikan` | `dilaporkan`, `diproses`, `selesai`                          |
+| `pengumuman.jenis`                   | `pengumuman`, `peraturan`                                    |
+
+Catatan: `notifikasi.jenis_notifikasi` bertipe VARCHAR(50), bukan ENUM.
+
+---
+
+## 5. Definition of Done
+
+Sebuah kartu dianggap selesai jika:
+
+- [ ] Berjalan di laptop anggota lain (bukan hanya laptop pembuat)
+- [ ] Tampilan sesuai desain Figma
+- [ ] Nama tabel, kolom, dan nilai ENUM sesuai kamus data
+- [ ] Sudah masuk ke `main` lewat Pull Request
+
+---
+
+## 6. Jadwal Cek Bersama
+
+| Hari        | Jam     | Fokus                                                    |
+| ----------- | ------- | -------------------------------------------------------- |
+| Rabu malam  | <20.00> | Semua laptop menjalankan halaman awal, aturan disepakati |
+| Kamis malam | <20.00> | Latihan alur Git: cabang → push → PR → merge             |
+| Jumat malam | <20.00> | Review checklist akhir dan perbaikan                     |
+
+---
+
+## 7. Dokumen Pendukung
+
+- Dokumentasi basis data dan ERD: `<tautan atau lokasi file>`
+- Desain Figma: `<tautan Figma>`
