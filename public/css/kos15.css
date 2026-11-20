@@ -1,0 +1,466 @@
+/*
+ * Gaya Kos 15, mengikuti prototipe Figma "Kelompok-3-RPL"
+ * Semua warna diambil dari frame Figma. Ubah di :root saja.
+ */
+:root {
+    /* Warna utama */
+    --kos-primer: #284C6C;        /* logo, tombol, garis menu aktif */
+    --kos-primer-gelap: #23435C;  /* hover tombol, teks merek */
+    --kos-primer-muda: #E7F0F7;   /* banner info, latar hover */
+
+    /* Teks */
+    --kos-judul: #182736;
+    --kos-teks: #334656;
+    --kos-redup: #6B7C8C;
+
+    /* Latar dan garis */
+    --kos-latar: #F5F8FA;
+    --kos-garis: #DFE7ED;
+    --kos-krem: #F4EDE4;          /* panel kiri halaman masuk dan daftar */
+    --kos-krem-tua: #D9C8B6;      /* lingkaran dekorasi */
+
+    /* Status */
+    --kos-hijau: #185739;   --kos-hijau-muda: #E3F3EB;
+    --kos-merah: #962222;   --kos-merah-muda: #FBE8E8;
+    --kos-kuning: #714506;  --kos-kuning-muda: #FBF0DB;
+
+    --kos-radius: 10px;
+    --kos-radius-kecil: 6px;
+    --kos-font-judul: 'Poppins', system-ui, sans-serif;
+    --kos-font-teks: 'Inter', system-ui, sans-serif;
+
+    /* Menyelaraskan Bootstrap */
+    --bs-body-font-family: var(--kos-font-teks);
+    --bs-body-color: var(--kos-teks);
+    --bs-body-bg: var(--kos-latar);
+    --bs-primary: var(--kos-primer);
+    --bs-primary-rgb: 40, 76, 108;
+    --bs-link-color: var(--kos-primer);
+    --bs-link-color-rgb: 40, 76, 108;
+    --bs-link-hover-color: var(--kos-primer-gelap);
+    --bs-border-color: var(--kos-garis);
+    --bs-border-radius: var(--kos-radius-kecil);
+}
+
+body {
+    font-family: var(--kos-font-teks);
+    font-size: .925rem;
+    color: var(--kos-teks);
+    background: var(--kos-latar);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6, .judul {
+    font-family: var(--kos-font-judul);
+    font-weight: 700;
+    color: var(--kos-judul);
+}
+
+a { text-decoration: none; }
+
+/* ---------- Tombol ---------- */
+.btn {
+    border-radius: var(--kos-radius-kecil);
+    font-weight: 500;
+    font-size: .875rem;
+    padding: .55rem 1.1rem;
+    background-image: none;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--kos-primer);
+    --bs-btn-border-color: var(--kos-primer);
+    --bs-btn-hover-bg: var(--kos-primer-gelap);
+    --bs-btn-hover-border-color: var(--kos-primer-gelap);
+    --bs-btn-active-bg: var(--kos-primer-gelap);
+    --bs-btn-active-border-color: var(--kos-primer-gelap);
+    --bs-btn-disabled-bg: var(--kos-primer);
+    --bs-btn-disabled-border-color: var(--kos-primer);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--kos-primer);
+    --bs-btn-border-color: var(--kos-primer);
+    --bs-btn-hover-bg: var(--kos-primer);
+    --bs-btn-hover-border-color: var(--kos-primer);
+    --bs-btn-active-bg: var(--kos-primer-gelap);
+}
+
+/* ---------- Form ---------- */
+.form-label {
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--kos-judul);
+    margin-bottom: .35rem;
+}
+
+.form-control {
+    border-color: var(--kos-garis);
+    border-radius: var(--kos-radius-kecil);
+    padding: .6rem .8rem;
+    font-size: .875rem;
+    color: var(--kos-judul);
+}
+
+.form-control::placeholder { color: #9AA8B4; }
+
+.form-control:focus {
+    border-color: var(--kos-primer);
+    box-shadow: 0 0 0 3px rgba(40, 76, 108, .12);
+}
+
+.sandi-wrap { position: relative; }
+.sandi-wrap .form-control { padding-right: 5.5rem; }
+.sandi-wrap .tombol-tampil {
+    position: absolute;
+    top: 50%;
+    right: .8rem;
+    transform: translateY(-50%);
+    border: 0;
+    background: none;
+    font-size: .75rem;
+    color: var(--kos-primer);
+    padding: 0;
+}
+.sandi-wrap .form-control.is-invalid + .tombol-tampil { right: 2.4rem; }
+
+/* ---------- Kartu, banner, status ---------- */
+.card {
+    border: 1px solid var(--kos-garis);
+    border-radius: var(--kos-radius);
+    box-shadow: none;
+}
+
+.banner-info {
+    background: var(--kos-primer-muda);
+    color: var(--kos-teks);
+    border-radius: var(--kos-radius-kecil);
+    padding: .8rem 1rem;
+    font-size: .85rem;
+}
+
+.lencana {
+    display: inline-block;
+    padding: .2rem .65rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 500;
+}
+.lencana-hijau  { background: var(--kos-hijau-muda);  color: var(--kos-hijau); }
+.lencana-merah  { background: var(--kos-merah-muda);  color: var(--kos-merah); }
+.lencana-kuning { background: var(--kos-kuning-muda); color: var(--kos-kuning); }
+.lencana-biru   { background: var(--kos-primer-muda); color: var(--kos-primer); }
+
+.alert { border-radius: var(--kos-radius-kecil); font-size: .85rem; border: 0; }
+.alert-success { background: var(--kos-hijau-muda); color: var(--kos-hijau); }
+.alert-danger  { background: var(--kos-merah-muda); color: var(--kos-merah); }
+
+/* ---------- Logo ---------- */
+.logo-kos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--kos-primer);
+    color: #fff;
+    font-family: var(--kos-font-judul);
+    font-weight: 700;
+    font-size: .75rem;
+    flex-shrink: 0;
+}
+.logo-kos.besar { width: 4.2rem; height: 4.2rem; font-size: 1.05rem; }
+.navbar-kos .logo-kos { width: 2.1rem; height: 2.1rem; }
+
+/* ---------- Navbar ---------- */
+.navbar-kos {
+    background: #fff;
+    border-bottom: 1px solid var(--kos-garis);
+    padding: .7rem 0;
+}
+
+.navbar-kos .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-family: var(--kos-font-judul);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--kos-primer-gelap);
+}
+
+.navbar-kos .nav-link {
+    color: var(--kos-teks);
+    font-size: .85rem;
+    padding: .4rem .2rem !important;
+    margin: 0 .7rem;
+    border-bottom: 2px solid transparent;
+}
+
+.navbar-kos .nav-link:hover { color: var(--kos-primer); }
+
+.navbar-kos .nav-link.active {
+    color: var(--kos-primer);
+    border-bottom-color: var(--kos-primer);
+}
+
+.navbar-kos .tombol-ikon {
+    border: 0;
+    background: none;
+    color: var(--kos-teks);
+    padding: .3rem .5rem;
+}
+
+.navbar-kos .nama-pengguna {
+    font-size: .8rem;
+    color: var(--kos-redup);
+}
+
+@media (max-width: 991.98px) {
+    .navbar-kos .navbar-nav { padding-top: .5rem; }
+    .navbar-kos .nav-link { margin: 0; border-bottom: 0; border-left: 2px solid transparent; padding-left: .7rem !important; }
+    .navbar-kos .nav-link.active { border-left-color: var(--kos-primer); }
+}
+
+/* ---------- Halaman ---------- */
+.judul-halaman {
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+/* ---------- Halaman masuk dan daftar ---------- */
+.auth {
+    display: flex;
+    min-height: 100vh;
+}
+
+.auth-kiri {
+    position: relative;
+    overflow: hidden;
+    flex: 1 1 50%;
+    background: var(--kos-krem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Lingkaran dekorasi seperti prototipe */
+.auth-kiri::before,
+.auth-kiri::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: var(--kos-krem-tua);
+}
+.auth-kiri::before { width: 15vw; height: 15vw; min-width: 140px; min-height: 140px; top: -5vw; right: -2.5vw; }
+.auth-kiri::after  { width: 17vw; height: 17vw; min-width: 160px; min-height: 160px; bottom: -4vw; left: -5.5vw; }
+
+.auth-kiri > * { position: relative; z-index: 1; }
+
+.auth-kiri .nama-kos { font-size: 1.9rem; margin: 1rem 0 .6rem; }
+.auth-kiri .slogan { color: var(--kos-teks); font-size: 1rem; margin-bottom: .4rem; }
+.auth-kiri .sub-slogan { color: var(--kos-redup); font-size: .8rem; }
+
+.auth-kanan {
+    flex: 1 1 50%;
+    background: var(--kos-latar);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+}
+
+.auth-kartu {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border: 1px solid var(--kos-garis);
+    border-radius: var(--kos-radius);
+    padding: 2.5rem 2rem 2rem;
+}
+
+.auth-kartu h1 { font-size: 1.4rem; margin-bottom: 1.6rem; }
+.auth-kartu .catatan { font-size: .72rem; color: var(--kos-redup); }
+.auth-kartu .tautan-bawah { font-size: .8rem; color: var(--kos-redup); text-align: center; margin: 1.5rem 0 0; }
+
+@media (max-width: 767.98px) {
+    .auth { flex-direction: column; min-height: auto; }
+    .auth-kiri { flex: none; padding: 2.5rem 1.5rem; }
+    .auth-kiri .nama-kos { font-size: 1.5rem; }
+    .auth-kanan { flex: none; padding: 1.5rem 1rem 3rem; }
+    .auth-kartu { padding: 1.8rem 1.3rem; }
+}
+
+/* =====================================================================
+ * KOMPONEN UNTUK KARTU 6 SAMPAI 8 (diambil dari frame prototipe)
+ * Contoh pemakaian ada di README bagian 8.
+ * ===================================================================== */
+
+/* Pita judul katalog: "Temukan kamar yang nyaman" */
+.pita-judul {
+    background: var(--kos-primer-muda);
+    padding: 3rem 0 2.5rem;
+}
+.pita-judul h1 { font-size: 2rem; margin-bottom: .5rem; }
+.pita-judul p { margin: 0; }
+
+/* Remah roti: Katalog / Kamar 01 / Ajukan Survei */
+.remah { font-size: .85rem; margin-bottom: 1rem; color: var(--kos-judul); }
+.remah a { color: var(--kos-primer); }
+.remah .pemisah { margin: 0 .6rem; color: var(--kos-redup); }
+
+/* Tombol filter bulat: Semua / Tersedia */
+.chip-filter {
+    display: inline-block;
+    padding: .35rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--kos-garis);
+    background: #fff;
+    color: var(--kos-judul);
+    font-size: .8rem;
+}
+.chip-filter.aktif { background: var(--kos-primer); border-color: var(--kos-primer); color: #fff; }
+
+/* Label harga krem: "Rp [HARGA] / bulan" */
+.lencana-krem { background: var(--kos-krem); color: var(--kos-judul); }
+
+/* Label fasilitas biru muda: "2,5 × 3 m" */
+.chip-fasilitas {
+    display: inline-block;
+    padding: .25rem .8rem;
+    border-radius: 999px;
+    background: var(--kos-primer-muda);
+    color: var(--kos-judul);
+    font-size: .8rem;
+    margin: 0 .35rem .35rem 0;
+}
+
+/* Tempat foto kamar */
+.foto-kamar {
+    background: var(--kos-primer-muda);
+    border-radius: var(--kos-radius-kecil);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--kos-teks);
+    font-size: .85rem;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    width: 100%;
+}
+.card > .foto-kamar:first-child { border-radius: var(--kos-radius) var(--kos-radius) 0 0; }
+.thumb-kamar { aspect-ratio: 4 / 3; border: 2px solid transparent; cursor: pointer; }
+.thumb-kamar.aktif { border-color: var(--kos-primer); }
+
+/* Baris label kiri, nilai kanan: Rincian Biaya, Ringkasan Pesanan */
+.baris-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .45rem 0;
+    font-size: .85rem;
+}
+.baris-info > :first-child { color: var(--kos-teks); }
+.baris-info > :last-child { color: var(--kos-judul); text-align: right; }
+.kotak-ringkasan {
+    background: var(--kos-latar);
+    border: 1px solid var(--kos-garis);
+    border-radius: var(--kos-radius-kecil);
+    padding: 1rem 1.5rem;
+}
+
+/* Angka besar: "Rp [NOMINAL DP]" */
+.nominal-besar {
+    font-family: var(--kos-font-judul);
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--kos-primer);
+}
+
+/* Langkah bernomor: Alur Survei */
+.langkah { list-style: none; padding: 0; margin: 0; }
+.langkah li { display: flex; align-items: center; gap: .8rem; margin-bottom: .7rem; font-size: .85rem; }
+.langkah li::before {
+    counter-increment: langkah;
+    content: counter(langkah);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--kos-primer);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+.langkah { counter-reset: langkah; }
+
+/* Garis waktu status: Diterima, Diproses, Disetujui/Ditolak */
+.garis-status { list-style: none; padding: 0; margin: 1.5rem 0; }
+.garis-status li {
+    position: relative;
+    padding: 0 0 1.4rem 1.8rem;
+    font-size: .85rem;
+    color: var(--kos-judul);
+}
+.garis-status li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: .15rem;
+    width: .8rem;
+    height: .8rem;
+    border-radius: 50%;
+    background: var(--kos-garis);
+}
+.garis-status li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: .37rem;
+    top: 1rem;
+    bottom: 0;
+    width: 2px;
+    background: var(--kos-garis);
+}
+.garis-status li.selesai::before { background: var(--kos-hijau); }
+.garis-status li.sekarang::before { background: var(--kos-primer); }
+.garis-status li.gagal::before { background: var(--kos-merah); }
+
+/* Kotak alasan penolakan */
+.kotak-merah {
+    background: var(--kos-merah-muda);
+    color: var(--kos-merah);
+    border-radius: var(--kos-radius-kecil);
+    padding: .8rem 1rem;
+    font-size: .85rem;
+}
+
+/* Ikon centang hijau: "Pengajuan survei tersimpan" */
+.ikon-sukses {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 50%;
+    background: var(--kos-hijau);
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+/* Kotak bergaris putus: tempat QRIS */
+.kotak-putus {
+    border: 1px dashed var(--kos-garis);
+    border-radius: var(--kos-radius-kecil);
+    background: var(--kos-latar);
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.teks-kecil { font-size: .75rem; color: var(--kos-redup); }

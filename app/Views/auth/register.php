@@ -1,50 +1,47 @@
-<!DOCTYPE html>
-<html lang="id">
+<?= $this->extend('layouts/auth') ?>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Daftar | Kos 15</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+<?= $this->section('content') ?>
+<?php $errors = (array) session('errors'); ?>
+<h1>Daftar di Kos 15</h1>
 
-<body class="bg-light">
-    <div class="container py-5" style="max-width: 460px;">
-        <h1 class="h4 mb-4 text-center">Daftar Calon Penghuni</h1>
+<form action="<?= site_url('daftar') ?>" method="post" novalidate>
+    <?= csrf_field() ?>
 
-        <?php foreach ((array) session('errors') as $pesan): ?>
-            <div class="alert alert-danger py-2"><?= esc($pesan) ?></div>
-        <?php endforeach; ?>
+    <?php
+    // nama kolom => [label, tipe, placeholder, autocomplete]
+    $kolom = [
+        'nama'                => ['Nama lengkap', 'text', 'Nama sesuai identitas', 'name'],
+        'no_hp'               => ['Nomor WhatsApp', 'tel', '08xxxxxxxxxx', 'tel'],
+        'username'            => ['Username', 'text', 'Huruf dan angka, minimal 4 karakter', 'username'],
+        'password'            => ['Kata sandi', 'password', 'Minimal 8 karakter', 'new-password'],
+        'konfirmasi_password' => ['Konfirmasi kata sandi', 'password', 'Ulangi kata sandi', 'new-password'],
+    ];
+    ?>
+    <?php foreach ($kolom as $nama => [$label, $tipe, $placeholder, $auto]): ?>
+        <?php $salah = isset($errors[$nama]); ?>
+        <div class="mb-3">
+            <label for="<?= $nama ?>" class="form-label"><?= $label ?></label>
+            <?php if ($tipe === 'password'): ?>
+                <div class="sandi-wrap">
+                    <input type="password" id="<?= $nama ?>" name="<?= $nama ?>" placeholder="<?= $placeholder ?>"
+                        autocomplete="<?= $auto ?>" class="form-control <?= $salah ? 'is-invalid' : '' ?>">
+                    <button type="button" class="tombol-tampil">Tampilkan</button>
+                </div>
+            <?php else: ?>
+                <input type="<?= $tipe ?>" id="<?= $nama ?>" name="<?= $nama ?>" placeholder="<?= $placeholder ?>"
+                    autocomplete="<?= $auto ?>" value="<?= esc(old($nama)) ?>"
+                    class="form-control <?= $salah ? 'is-invalid' : '' ?>">
+            <?php endif; ?>
+            <?php if ($salah): ?>
+                <div class="invalid-feedback d-block"><?= esc($errors[$nama]) ?></div>
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
 
-        <form action="<?= site_url('daftar') ?>" method="post" class="card card-body shadow-sm">
-            <?= csrf_field() ?>
-            <div class="mb-3">
-                <label for="nama" class="form-label">Nama lengkap</label>
-                <input type="text" id="nama" name="nama" class="form-control" value="<?= esc(old('nama')) ?>" autofocus>
-            </div>
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" name="username" class="form-control"
-                    value="<?= esc(old('username')) ?>">
-            </div>
-            <div class="mb-3">
-                <label for="no_hp" class="form-label">Nomor HP</label>
-                <input type="text" id="no_hp" name="no_hp" class="form-control" placeholder="08xxxxxxxxxx"
-                    value="<?= esc(old('no_hp')) ?>">
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Kata sandi</label>
-                <input type="password" id="password" name="password" class="form-control">
-            </div>
-            <div class="mb-3">
-                <label for="konfirmasi_password" class="form-label">Konfirmasi kata sandi</label>
-                <input type="password" id="konfirmasi_password" name="konfirmasi_password" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Daftar</button>
-        </form>
+    <p class="catatan mb-4">Nomor WhatsApp dipakai pemilik untuk menghubungi kamu soal survei dan pemesanan.</p>
 
-        <p class="text-center mt-3">Sudah punya akun? <a href="<?= site_url('login') ?>">Masuk</a></p>
-    </div>
-</body>
+    <button type="submit" class="btn btn-primary w-100">Buat Akun</button>
+</form>
 
-</html>
+<p class="tautan-bawah">Sudah punya akun? <a href="<?= site_url('login') ?>">Masuk</a></p>
+<?= $this->endSection() ?>

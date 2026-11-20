@@ -134,3 +134,62 @@ Sebuah kartu dianggap selesai jika:
 
 - Dokumentasi basis data dan ERD: `<tautan atau lokasi file>`
 - Desain Figma: `<tautan Figma>`
+
+---
+
+## 8. Memakai Layout dan Hak Akses (Kartu 5)
+
+**View halaman baru** cukup memakai layout utama:
+
+```php
+<?= $this->extend('layouts/main') ?>
+
+<?= $this->section('content') ?>
+    <h1 class="h4">Judul halaman</h1>
+    ...isi halaman...
+<?= $this->endSection() ?>
+```
+
+Kirim `judul` dari controller agar judul tab ikut berubah: `view('kamar/index', ['judul' => 'Kamar'])`.
+
+**Route** dimasukkan ke grup peran yang sesuai di `app/Config/Routes.php`. Filter `peran` otomatis mengarahkan tamu ke login dan menampilkan 403 untuk peran lain.
+
+```php
+$routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($routes) {
+    $routes->get('kamar', 'KatalogKamar::index');
+});
+```
+
+**Menu navbar** diatur di `app/Config/Menu.php`. Tambah atau ubah baris di sana, jangan mengedit layout.
+
+**Pesan flash** cukup `->with('sukses', '...')` atau `->with('gagal', '...')`. Layout menampilkannya otomatis.
+
+**Data session** yang tersedia: `session('id_pengguna')`, `session('nama')`, `session('role')`, `session('logged_in')`.
+
+**Warna dan komponen** sudah mengikuti prototipe Figma dan ada di `public/css/kos15.css`. Jangan menulis warna sendiri, pakai class berikut:
+
+| Bagian di prototipe | Class |
+| --- | --- |
+| Judul halaman ("Status Pengajuan") | `h1.judul-halaman` |
+| Pita biru "Temukan kamar yang nyaman" | `div.pita-judul` (di luar `.container`) |
+| Katalog / Kamar 01 / Ajukan Survei | `nav.remah`, pemisah `span.pemisah` |
+| Tombol bulat Semua / Tersedia | `a.chip-filter`, yang aktif `.chip-filter.aktif` |
+| Kartu putih | `div.card.p-4` |
+| Tempat foto kamar | `div.foto-kamar` atau `img.foto-kamar`, kecil `.thumb-kamar` |
+| Label Tersedia / Diproses / Ditolak | `span.lencana.lencana-hijau` / `lencana-kuning` / `lencana-merah` |
+| Label harga krem | `span.lencana.lencana-krem` |
+| Label fasilitas | `span.chip-fasilitas` |
+| Banner info biru muda | `div.banner-info` |
+| Rincian biaya, ringkasan pesanan | `div.baris-info` berisi dua `span`, bungkus `div.kotak-ringkasan` |
+| Rp [NOMINAL DP] | `div.nominal-besar` |
+| Alur Survei bernomor | `ol.langkah` |
+| Diterima, Diproses, Disetujui | `ul.garis-status` dengan `li.selesai` / `li.sekarang` / `li.gagal` |
+| Kotak alasan merah | `div.kotak-merah` |
+| Centang hijau | `span.ikon-sukses` |
+| Kotak QRIS bergaris putus | `div.kotak-putus` |
+| Tombol utama / garis | `btn btn-primary` / `btn btn-outline-primary` |
+| Teks kecil abu | `.teks-kecil` |
+
+**Notifikasi** dikirim lewat `model(NotifikasiModel::class)->kirim($idPengguna, 'pemesanan', 'Pesan')`, lalu lonceng di navbar menghitungnya otomatis.
+
+**Akun uji** (kata sandi `password123`): `pemilik`, `budi` (penghuni), `rina` (calon penghuni).

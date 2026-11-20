@@ -20,7 +20,7 @@ class Auth extends BaseController
             return $this->arahkanSesuaiPeran((string) session('role'));
         }
 
-        return view('auth/login');
+        return view('auth/login', ['judul' => 'Masuk']);
     }
 
     public function attemptLogin(): RedirectResponse
@@ -35,7 +35,8 @@ class Auth extends BaseController
         ];
 
         if (!$this->validate($aturan, $pesan)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            return redirect()->back()->withInput()
+                ->with('gagal', implode(' ', $this->validator->getErrors()));
         }
 
         $pengguna = model(PenggunaModel::class)
@@ -45,7 +46,7 @@ class Auth extends BaseController
         $sandi = (string) $this->request->getPost('password');
 
         if ($pengguna === null || !password_verify($sandi, $pengguna['password'])) {
-            return redirect()->back()->withInput()->with('errors', ['login' => 'Username atau kata sandi salah.']);
+            return redirect()->back()->withInput()->with('gagal', 'Username atau kata sandi salah.');
         }
 
         session()->regenerate();
@@ -56,6 +57,13 @@ class Auth extends BaseController
             'logged_in' => true,
         ]);
 
+        // Kembali ke halaman yang tadi dibuka sebelum diminta login (diisi PeranFilter)
+        $tujuan = session('redirect_url');
+        session()->remove('redirect_url');
+        if ($tujuan) {
+            return redirect()->to($tujuan);
+        }
+
         return $this->arahkanSesuaiPeran($pengguna['role']);
     }
 
@@ -65,7 +73,11 @@ class Auth extends BaseController
             return $this->arahkanSesuaiPeran((string) session('role'));
         }
 
-        return view('auth/register');
+        return view('auth/register', [
+            'judul'     => 'Daftar',
+            'slogan'    => 'Tempat tinggal nyaman, tagihan tertib',
+            'subSlogan' => 'Daftar untuk memesan kamar secara online',
+        ]);
     }
 
     public function attemptRegister(): RedirectResponse
@@ -91,8 +103,8 @@ class Auth extends BaseController
                 'is_unique' => 'Username sudah dipakai, pilih yang lain.',
             ],
             'no_hp' => [
-                'required' => 'Nomor HP wajib diisi.',
-                'regex_match' => 'Nomor HP harus diawali 08 dan terdiri dari 10 sampai 14 angka.',
+                'required' => 'Nomor WhatsApp wajib diisi.',
+                'regex_match' => 'Nomor WhatsApp harus diawali 08 dan terdiri dari 10 sampai 14 angka.',
             ],
             'password' => [
                 'required' => 'Kata sandi wajib diisi.',
@@ -125,7 +137,7 @@ class Auth extends BaseController
     {
         session()->destroy();
 
-        return redirect()->to('login');
+        return redirect()->to('login')->with('sukses', 'Anda sudah keluar.');
     }
 
     private function arahkanSesuaiPeran(string $role): RedirectResponse
