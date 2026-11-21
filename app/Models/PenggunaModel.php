@@ -6,7 +6,8 @@ use CodeIgniter\Model;
 
 /**
  * Model tabel `pengguna`
- * Akun pemilik, admin, penghuni, dan calon penghuni.
+ * Akun pemilik, penghuni, dan calon penghuni.
+ * Nilai role: 'pemilik', 'penghuni', 'calon_penghuni'.
  */
 class PenggunaModel extends Model
 {
