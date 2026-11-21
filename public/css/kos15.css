@@ -801,3 +801,38 @@ body.panel-pemilik .lencana { font-size: 12px; line-height: 18px; padding: 4px 1
     .konten-pemilik { padding: 24px 16px; }
     body.panel-pemilik .judul-halaman { font-size: 22px; line-height: 30px; }
 }
+
+/* =====================================================================
+ * KARTU 7: KATALOG PUBLIK, DETAIL KAMAR, DAN SURVEI
+ * Hanya tambahan. Warna tetap memakai variabel di :root.
+ * ===================================================================== */
+
+/* Label "Terisi" abu */
+.lencana-abu { background: var(--kos-latar); color: var(--kos-redup); box-shadow: inset 0 0 0 1px var(--kos-garis); }
+
+/* Angka kecil di tombol filter: Semua 19 */
+.angka-filter { margin-left: .25rem; padding: 0 .45rem; border-radius: 999px; font-size: .7rem; background: var(--kos-primer-muda); color: var(--kos-primer); }
+.chip-filter.aktif .angka-filter { background: rgba(255, 255, 255, .22); color: #fff; }
+
+/* Kartu kamar di katalog */
+.kartu-katalog { overflow: hidden; }
+.kartu-katalog .foto-kamar { aspect-ratio: 4 / 3; border-radius: 0; text-align: center; padding: .5rem; }
+.kartu-katalog img.foto-kamar, .kartu-katalog video.foto-kamar { padding: 0; object-fit: cover; }
+.kartu-katalog.terisi .foto-kamar { filter: grayscale(.5); opacity: .85; }
+
+/* Detail kamar: galeri kiri, harga kanan. Di HP: galeri, harga, lalu fasilitas */
+.detail-kamar { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); grid-template-areas: "galeri" "aside" "info"; }
+.detail-galeri { grid-area: galeri; }
+.detail-aside  { grid-area: aside; }
+.detail-info   { grid-area: info; }
+@media (min-width: 992px) {
+    .detail-kamar { grid-template-columns: minmax(0, 1fr) 360px; grid-template-areas: "galeri aside" "info aside"; align-items: start; }
+    .panel-lengket { position: sticky; top: 1.5rem; }
+}
+.galeri-utama { aspect-ratio: 16 / 10; overflow: hidden; text-align: center; padding: 1rem; }
+.galeri-utama:has(img, video) { padding: 0; }
+.galeri-utama img, .galeri-utama video { width: 100%; height: 100%; object-fit: cover; }
+.galeri-utama video { background: #000; object-fit: contain; }
+.thumb-kamar { overflow: hidden; color: var(--kos-primer); font-weight: 500; }
+.thumb-kamar img { width: 100%; height: 100%; object-fit: cover; }
+.baris-info .angka-dp { font-family: var(--kos-font-judul); font-weight: 700; font-size: 1.15rem; color: var(--kos-primer); }

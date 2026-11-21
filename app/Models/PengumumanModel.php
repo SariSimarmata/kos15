@@ -24,4 +24,14 @@ class PengumumanModel extends Model
 
     // Tabel tidak memiliki kolom created_at / updated_at
     protected $useTimestamps = false;
+
+    /**
+     * Peraturan kos (jenis = 'peraturan'), urut dari yang paling lama terbit.
+     */
+    public function peraturan(): array
+    {
+        return $this->where('jenis', 'peraturan')
+            ->orderBy('tanggal_terbit', 'ASC')
+            ->findAll();
+    }
 }

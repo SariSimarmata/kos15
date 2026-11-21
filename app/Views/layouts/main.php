@@ -9,6 +9,9 @@
 <body>
     <?= $this->include('partials/navbar') ?>
 
+    <?php /* Bagian selebar layar di bawah navbar, mis. pita judul katalog (Kartu 7) */ ?>
+    <?= $this->renderSection('pita') ?>
+
     <main class="container py-4 py-lg-5">
         <?= $this->include('partials/flash') ?>
         <?= $this->renderSection('content') ?>

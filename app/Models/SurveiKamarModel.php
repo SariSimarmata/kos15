@@ -27,4 +27,18 @@ class SurveiKamarModel extends Model
 
     // Tabel tidak memiliki kolom created_at / updated_at
     protected $useTimestamps = false;
+
+    /**
+     * Survei yang sama persis (kamar, nomor HP, tanggal, jam) sudah ada?
+     * Dipakai untuk mencegah data ganda saat tombol ditekan dua kali.
+     */
+    public function cariDuplikat(int $idKamar, string $noHp, string $tanggal, string $waktu): ?array
+    {
+        return $this->where([
+            'id_kamar'       => $idKamar,
+            'no_hp'          => $noHp,
+            'tanggal_survei' => $tanggal,
+            'waktu_survei'   => $waktu,
+        ])->first();
+    }
 }
