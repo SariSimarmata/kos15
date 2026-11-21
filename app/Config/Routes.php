@@ -23,6 +23,16 @@ $routes->post('logout', 'Auth::logout');
 // Pemilik (Kartu 6, 8, dan seterusnya)
 $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($routes) {
     $routes->get('dashboard', 'Sementara::dashboardPemilik'); // SEMENTARA
+
+    // Kelola kamar (Kartu 6)
+    $routes->get('kamar', 'Pemilik\Kamar::index');
+    $routes->get('kamar/tambah', 'Pemilik\Kamar::tambah');
+    $routes->post('kamar/simpan', 'Pemilik\Kamar::simpan');
+    $routes->get('kamar/(:num)/ubah', 'Pemilik\Kamar::ubah/$1');
+    $routes->post('kamar/(:num)/perbarui', 'Pemilik\Kamar::perbarui/$1');
+    $routes->post('kamar/(:num)/hapus', 'Pemilik\Kamar::hapus/$1');
+    $routes->post('kamar/(:num)/media', 'Pemilik\Kamar::unggahMedia/$1');
+    $routes->post('media/(:num)/hapus', 'Pemilik\Kamar::hapusMedia/$1');
 });
 
 // Penghuni
@@ -33,7 +43,4 @@ $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($rou
 // Katalog publik (Kartu 7). Bisa dibuka tanpa login, jadi tanpa filter.
 $routes->get('katalog', 'Sementara::katalog'); // SEMENTARA
 
-// Fitur calon penghuni yang wajib login (pesan kamar, pantau pengajuan)
-$routes->group('', ['filter' => 'peran:calon_penghuni'], static function ($routes) {
-    // contoh Kartu 8: $routes->post('pemesanan', 'Pemesanan::simpan');
-});
+//
