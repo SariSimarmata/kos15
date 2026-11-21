@@ -45,7 +45,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- 1. pengguna : akun pemilik, admin, penghuni, dan calon penghuni
+-- 1. pengguna : akun pemilik, penghuni, dan calon penghuni
 -- ---------------------------------------------------------------------
 CREATE TABLE pengguna (
   id_pengguna INT          NOT NULL AUTO_INCREMENT,
@@ -53,7 +53,7 @@ CREATE TABLE pengguna (
   username    VARCHAR(50)  NOT NULL,
   `password`  VARCHAR(255) NOT NULL COMMENT 'Hash bcrypt (password_hash)',
   no_hp       VARCHAR(15)  NOT NULL,
-  `role`      ENUM('pemilik','admin','penghuni','calon_penghuni') NOT NULL DEFAULT 'calon_penghuni',
+  `role`      ENUM('pemilik','penghuni','calon_penghuni') NOT NULL DEFAULT 'calon_penghuni',
   PRIMARY KEY (id_pengguna),
   UNIQUE KEY uq_pengguna_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -179,7 +179,7 @@ CREATE TABLE tagihan (
 -- 9. pembayaran : pembayaran QRIS (gateway) atau tunai
 --    (tagihan 1 : N pembayaran, pengguna 0..1 : N pembayaran sebagai konfirmator)
 --    order_id, id_transaksi_gateway, qris_url, waktu_kedaluwarsa hanya untuk QRIS
---    id_konfirmator hanya untuk tunai (pemilik/admin yang mengonfirmasi)
+--    id_konfirmator hanya untuk tunai (pemilik yang mengonfirmasi)
 -- ---------------------------------------------------------------------
 CREATE TABLE pembayaran (
   id_pembayaran        INT           NOT NULL AUTO_INCREMENT,
@@ -364,7 +364,6 @@ CREATE TABLE notifikasi (
 -- Password semua akun: password123
 INSERT INTO pengguna (id_pengguna, nama, username, `password`, no_hp, `role`) VALUES
 (1, 'Pak Hasan',     'pemilik',  '$2y$10$hayXO/Lz7wVZTo6UY.akEujuXuDtdxh8wujL0t6brEocWpTv.z6ZO', '081200000001', 'pemilik'),
-(2, 'Admin Kos',     'admin',    '$2y$10$hayXO/Lz7wVZTo6UY.akEujuXuDtdxh8wujL0t6brEocWpTv.z6ZO', '081200000002', 'admin'),
 (3, 'Budi Santoso',  'budi',     '$2y$10$hayXO/Lz7wVZTo6UY.akEujuXuDtdxh8wujL0t6brEocWpTv.z6ZO', '081200000003', 'penghuni'),
 (4, 'Sari Lestari',  'sari',     '$2y$10$hayXO/Lz7wVZTo6UY.akEujuXuDtdxh8wujL0t6brEocWpTv.z6ZO', '081200000004', 'penghuni'),
 (5, 'Rina Wulandari','rina',     '$2y$10$hayXO/Lz7wVZTo6UY.akEujuXuDtdxh8wujL0t6brEocWpTv.z6ZO', '081200000005', 'calon_penghuni');
