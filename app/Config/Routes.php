@@ -23,6 +23,11 @@ $routes->post('logout', 'Auth::logout');
 // Pemilik (Kartu 6, 8, dan seterusnya)
 $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($routes) {
     $routes->get('dashboard', 'Sementara::dashboardPemilik'); // SEMENTARA
+
+    // Kartu 8: persetujuan pemesanan
+    $routes->get('pemesanan', 'Pemesanan::daftar');
+    $routes->post('pemesanan/(:num)/setujui', 'Pemesanan::setujui/$1');
+    $routes->post('pemesanan/(:num)/tolak', 'Pemesanan::tolak/$1');
 });
 
 // Penghuni
@@ -34,6 +39,10 @@ $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($rou
 $routes->get('katalog', 'Sementara::katalog'); // SEMENTARA
 
 // Fitur calon penghuni yang wajib login (pesan kamar, pantau pengajuan)
-$routes->group('', ['filter' => 'peran:calon_penghuni'], static function ($routes) {
-    // contoh Kartu 8: $routes->post('pemesanan', 'Pemesanan::simpan');
+// Kartu 8: /pemesanan/baru/{id_kamar} dipakai tombol "Pesan" di katalog (Kartu 7)
+$routes->group('pemesanan', ['filter' => 'peran:calon_penghuni'], static function ($routes) {
+    $routes->get('baru', 'Pemesanan::form');
+    $routes->get('baru/(:num)', 'Pemesanan::form/$1');
+    $routes->post('/', 'Pemesanan::simpan');
+    $routes->get('status', 'Pemesanan::status');
 });
