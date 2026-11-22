@@ -464,3 +464,375 @@ a { text-decoration: none; }
 }
 
 .teks-kecil { font-size: .75rem; color: var(--kos-redup); }
+
+/* =====================================================================
+ * KARTU 8: HALAMAN PEMILIK "PEMESANAN KAMAR"
+ * Mengikuti frame Figma "Kos 15 – Halaman Pemilik (Revisi)" > Pemesanan Kamar
+ * ===================================================================== */
+.header-halaman { margin-bottom: 1.5rem; }
+.header-halaman p { color: var(--kos-redup); font-size: .875rem; }
+
+/* Daftar (lebar sisa) + detail (460px); bertumpuk di layar sempit */
+.pemesanan-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+@media (min-width: 1200px) {
+    .pemesanan-grid { grid-template-columns: minmax(0, 1fr) 460px; }
+}
+
+.kartu-panel {
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(38, 55, 70, .06);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.judul-panel { font-size: 1.125rem; font-weight: 600; }
+
+/* Tab Menunggu / Disetujui / Ditolak */
+.tab-status {
+    display: flex;
+    gap: .5rem;
+    border-bottom: 1px solid var(--kos-garis);
+    overflow-x: auto;
+}
+.tab-status a {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .625rem .75rem .75rem;
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    color: var(--kos-redup);
+    font-size: .875rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.tab-status a:hover { color: var(--kos-primer); }
+.tab-status a.aktif { color: var(--kos-primer); border-bottom-color: var(--kos-primer); }
+.tab-status .angka {
+    padding: 1px .5rem;
+    border-radius: 999px;
+    background: #EEF1F4;
+    color: var(--kos-redup);
+    font-size: .75rem;
+    line-height: 18px;
+}
+.tab-status a.aktif .angka { background: var(--kos-primer-muda); color: var(--kos-primer); }
+
+/* Satu baris pemesanan */
+.baris-pemesanan {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .875rem 1rem;
+    border: 1px solid var(--kos-garis);
+    border-radius: 12px;
+    background: #fff;
+    color: inherit;
+}
+.baris-pemesanan:hover { border-color: var(--kos-primer); }
+.baris-pemesanan.aktif { background: var(--kos-primer-muda); border-color: var(--kos-primer); }
+.baris-pemesanan .nama { display: block; font-size: .875rem; font-weight: 500; color: var(--kos-judul); line-height: 22px; }
+.baris-pemesanan .sub { display: block; font-size: .75rem; color: var(--kos-redup); line-height: 18px; }
+.baris-pemesanan .lencana { flex-shrink: 0; }
+.min-w-0 { min-width: 0; }
+
+.avatar-inisial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--kos-primer-muda);
+    color: var(--kos-primer);
+    font-size: .75rem;
+    font-weight: 500;
+}
+.baris-pemesanan.aktif .avatar-inisial { background: #fff; }
+.avatar-inisial.besar { width: 40px; height: 40px; }
+
+.nama-detail { font-size: .875rem; font-weight: 500; color: var(--kos-judul); }
+
+.kartu-panel .kotak-ringkasan { border-radius: 12px; padding: .75rem 1rem; }
+.kartu-panel .kotak-ringkasan .baris-info { padding: .3rem 0; font-size: .875rem; }
+
+/* Kotak "Saat disetujui, sistem otomatis" */
+.kotak-otomatis {
+    background: var(--kos-primer-muda);
+    border-radius: 12px;
+    padding: 1rem;
+    color: var(--kos-primer-gelap);
+}
+.kotak-otomatis .judul-otomatis { font-size: .875rem; font-weight: 500; margin-bottom: .5rem; }
+.kotak-otomatis ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+.kotak-otomatis li { display: flex; gap: .5rem; font-size: .75rem; line-height: 18px; }
+.kotak-otomatis li i { flex-shrink: 0; font-size: 1rem; line-height: 18px; }
+
+/* Tombol Tolak (garis merah) dan Setujui, tinggi 44px */
+.btn-tolak, .btn-aksi { height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.btn-tolak {
+    background: #fff;
+    border: 1px solid var(--kos-merah);
+    color: var(--kos-merah);
+}
+.btn-tolak:hover, .btn-tolak:focus-visible { background: var(--kos-merah-muda); color: var(--kos-merah); border-color: var(--kos-merah); }
+
+/* =====================================================================
+ * LAYOUT PEMILIK (layouts/pemilik.php)
+ * Mengikuti Figma "Kos 15 – Halaman Pemilik (Revisi)".
+ * Warna Figma hanya berlaku di dalam body.panel-pemilik,
+ * jadi halaman calon penghuni dan penghuni tidak ikut berubah.
+ * ===================================================================== */
+body.panel-pemilik {
+    --kos-primer: #426A8C;        /* primary */
+    --kos-primer-gelap: #34546D;  /* primary-hover */
+    --kos-primer-muda: #E7F0F7;   /* panel-sekunder */
+    --kos-judul: #263746;         /* teks/heading */
+    --kos-teks: #263746;
+    --kos-redup: #5A6E7D;         /* teks/sekunder */
+    --kos-latar: #F5F8FA;         /* bg/halaman */
+    --kos-garis: #DFE7ED;         /* border */
+    --kos-hijau: #276B4C;  --kos-hijau-muda: #E3F3EB;   /* status/sukses */
+    --kos-merah: #B03A3A;  --kos-merah-muda: #FBE8E8;   /* status/gagal */
+    --kos-kuning: #8A5A12; --kos-kuning-muda: #FBF0DB;  /* status/proses */
+    --bs-primary-rgb: 66, 106, 140;
+
+    display: flex;
+    min-height: 100vh;
+    font-size: .875rem;           /* Body/Regular 14px */
+    line-height: 22px;
+}
+
+body.panel-pemilik h1, body.panel-pemilik h2, body.panel-pemilik h3 { font-weight: 600; }
+body.panel-pemilik .judul-halaman { font-size: 28px; line-height: 36px; }   /* Heading/H1 */
+body.panel-pemilik .judul-panel { font-size: 18px; line-height: 26px; }     /* Heading/H3 */
+body.panel-pemilik .header-halaman p { color: var(--kos-redup); font-size: .875rem; }
+body.panel-pemilik .banner-info { border-radius: 12px; padding: .875rem 1rem; font-size: .875rem; color: var(--kos-judul); }
+body.panel-pemilik .card { border-radius: 12px; }
+body.panel-pemilik .lencana { font-size: 12px; line-height: 18px; padding: 4px 12px; }
+
+/* ---------- Sidebar ---------- */
+.sidebar-pemilik {
+    position: sticky;
+    top: 0;
+    flex: 0 0 280px;
+    width: 280px;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 20px 16px;
+    background: var(--kos-primer);
+    color: #fff;
+    z-index: 1040;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 8px 12px;
+    color: #fff;
+}
+.sidebar-logo:hover { color: #fff; }
+.sidebar-logo .logo-tanda {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--kos-primer);
+    font-family: var(--kos-font-judul);
+    font-weight: 600;
+    font-size: 18px;
+}
+.sidebar-logo .nama { display: block; font-family: var(--kos-font-judul); font-weight: 600; font-size: 18px; line-height: 26px; }
+.sidebar-logo .sub  { display: block; font-size: 12px; line-height: 18px; color: var(--kos-primer-muda); }
+
+.sidebar-menu { display: flex; flex-direction: column; gap: 2px; }
+
+.sidebar-grup {
+    padding: 10px 12px 2px;
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 500;
+    letter-spacing: .8px;
+    opacity: .6;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    height: 36px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, .85);
+    font-size: 14px;
+    line-height: 22px;
+    text-align: left;
+}
+.sidebar-item i { font-size: 18px; line-height: 1; width: 18px; text-align: center; }
+.sidebar-item:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+.sidebar-item.aktif { background: rgba(255, 255, 255, .18); color: #fff; font-weight: 500; }
+.sidebar-item:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+
+.sidebar-angka {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--kos-primer);
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 500;
+}
+
+.sidebar-keluar { margin-top: auto; padding-top: 16px; }
+
+/* ---------- Area kanan: navbar + konten ---------- */
+.pemilik-utama { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+
+.topbar-pemilik {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 32px;
+    background: #fff;
+    border-bottom: 1px solid var(--kos-garis);
+}
+
+.remah-pemilik { color: var(--kos-redup); font-size: 14px; }
+
+.tombol-menu {
+    border: 1px solid var(--kos-garis);
+    border-radius: 8px;
+    background: #fff;
+    width: 40px;
+    height: 40px;
+    color: var(--kos-judul);
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Lonceng (LoncengCell): kotak 40px bergaris, angka jadi titik merah seperti Figma */
+.topbar-pemilik .tombol-ikon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--kos-garis);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--kos-judul);
+}
+.topbar-pemilik .tombol-ikon .fs-5 { font-size: 18px !important; }
+.topbar-pemilik .tombol-ikon .badge {
+    top: 9px !important;
+    left: auto !important;
+    right: 8px;
+    transform: none !important;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    font-size: 0;
+    border: 1.5px solid #fff;
+}
+
+.profil-pemilik { display: flex; align-items: center; gap: 12px; }
+.profil-pemilik .avatar-profil {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--kos-primer);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+.profil-pemilik .nama  { display: block; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--kos-judul); white-space: nowrap; }
+.profil-pemilik .peran { display: block; font-size: 12px; line-height: 18px; color: var(--kos-redup); }
+
+.konten-pemilik { padding: 32px; }
+.konten-pemilik .header-halaman { margin-bottom: 24px; }
+
+/* ---------- Layar kecil: sidebar jadi laci dari kiri ---------- */
+.sidebar-tirai { display: none; }
+
+@media (max-width: 991.98px) {
+    .sidebar-pemilik {
+        position: fixed;
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform .2s ease;
+    }
+    body.sidebar-terbuka .sidebar-pemilik { transform: none; }
+    body.sidebar-terbuka .sidebar-tirai {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(38, 55, 70, .45);
+        z-index: 1030;
+    }
+    .topbar-pemilik { padding: 0 16px; }
+    .konten-pemilik { padding: 24px 16px; }
+    body.panel-pemilik .judul-halaman { font-size: 22px; line-height: 30px; }
+}
+
+/* =====================================================================
+ * KARTU 7: KATALOG PUBLIK, DETAIL KAMAR, DAN SURVEI
+ * Hanya tambahan. Warna tetap memakai variabel di :root.
+ * ===================================================================== */
+
+/* Label "Terisi" abu */
+.lencana-abu { background: var(--kos-latar); color: var(--kos-redup); box-shadow: inset 0 0 0 1px var(--kos-garis); }
+
+/* Angka kecil di tombol filter: Semua 19 */
+.angka-filter { margin-left: .25rem; padding: 0 .45rem; border-radius: 999px; font-size: .7rem; background: var(--kos-primer-muda); color: var(--kos-primer); }
+.chip-filter.aktif .angka-filter { background: rgba(255, 255, 255, .22); color: #fff; }
+
+/* Kartu kamar di katalog */
+.kartu-katalog { overflow: hidden; }
+.kartu-katalog .foto-kamar { aspect-ratio: 4 / 3; border-radius: 0; text-align: center; padding: .5rem; }
+.kartu-katalog img.foto-kamar, .kartu-katalog video.foto-kamar { padding: 0; object-fit: cover; }
+.kartu-katalog.terisi .foto-kamar { filter: grayscale(.5); opacity: .85; }
+
+/* Detail kamar: galeri kiri, harga kanan. Di HP: galeri, harga, lalu fasilitas */
+.detail-kamar { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); grid-template-areas: "galeri" "aside" "info"; }
+.detail-galeri { grid-area: galeri; }
+.detail-aside  { grid-area: aside; }
+.detail-info   { grid-area: info; }
+@media (min-width: 992px) {
+    .detail-kamar { grid-template-columns: minmax(0, 1fr) 360px; grid-template-areas: "galeri aside" "info aside"; align-items: start; }
+    .panel-lengket { position: sticky; top: 1.5rem; }
+}
+.galeri-utama { aspect-ratio: 16 / 10; overflow: hidden; text-align: center; padding: 1rem; }
+.galeri-utama:has(img, video) { padding: 0; }
+.galeri-utama img, .galeri-utama video { width: 100%; height: 100%; object-fit: cover; }
+.galeri-utama video { background: #000; object-fit: contain; }
+.thumb-kamar { overflow: hidden; color: var(--kos-primer); font-weight: 500; }
+.thumb-kamar img { width: 100%; height: 100%; object-fit: cover; }
+.baris-info .angka-dp { font-family: var(--kos-font-judul); font-weight: 700; font-size: 1.15rem; color: var(--kos-primer); }

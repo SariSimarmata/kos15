@@ -17,9 +17,4 @@ class Sementara extends BaseController
     {
         return view('sementara/index', ['judul' => 'Tagihan Saya', 'kartu' => 'kartu tagihan']);
     }
-
-    public function katalog()
-    {
-        return view('sementara/index', ['judul' => 'Katalog Kamar', 'kartu' => 'Kartu 7']);
-    }
 }
