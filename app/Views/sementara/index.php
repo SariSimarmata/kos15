@@ -6,7 +6,8 @@ if ($halamanPemilik && ($judul ?? '') === 'Dasbor Pemilik') {
     $judul = 'Dashboard';
 }
 ?>
-<?= $this->extend($halamanPemilik ? 'layouts/pemilik' : 'layouts/main') ?>
+<?php $halamanPenghuni = str_starts_with(trim(uri_string(), '/'), 'penghuni/'); ?>
+<?= $this->extend($halamanPemilik ? 'layouts/pemilik' : ($halamanPenghuni ? 'layouts/penghuni' : 'layouts/main')) ?>
 
 <?= $this->section('content') ?>
 <!-- Halaman sementara (Kartu 5). Diganti oleh kartu pemilik halaman ini. -->

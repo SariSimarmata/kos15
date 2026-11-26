@@ -34,6 +34,14 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     $routes->post('kamar/(:num)/media', 'Pemilik\Kamar::unggahMedia/$1');
     $routes->post('media/(:num)/hapus', 'Pemilik\Kamar::hapusMedia/$1');
 
+    // Data penghuni (Kartu 4 Sprint 4)
+    $routes->get('penghuni', 'Pemilik\Penghuni::index');
+    $routes->get('penghuni/tambah', 'Pemilik\Penghuni::tambah');
+    $routes->post('penghuni/simpan', 'Pemilik\Penghuni::simpan');
+    $routes->get('penghuni/(:num)/ubah', 'Pemilik\Penghuni::ubah/$1');
+    $routes->post('penghuni/(:num)/perbarui', 'Pemilik\Penghuni::perbarui/$1');
+    $routes->post('penghuni/(:num)/hapus', 'Pemilik\Penghuni::hapus/$1');
+
     // Kartu 8: persetujuan pemesanan
     $routes->get('pemesanan', 'Pemesanan::daftar');
     $routes->post('pemesanan/(:num)/setujui', 'Pemesanan::setujui/$1');
@@ -43,6 +51,9 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
 // Penghuni
 $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($routes) {
     $routes->get('tagihan', 'Sementara::tagihanPenghuni'); // SEMENTARA
+
+    // Masa sewa (Kartu 4 Sprint 4)
+    $routes->get('sewa', 'Penghuni\Sewa::index');
 });
 
 // Katalog publik (Kartu 7). Bisa dibuka tanpa login, jadi tanpa filter.
