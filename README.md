@@ -193,3 +193,159 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
 **Notifikasi** dikirim lewat `model(NotifikasiModel::class)->kirim($idPengguna, 'pemesanan', 'Pesan')`, lalu lonceng di navbar menghitungnya otomatis.
 
 **Akun uji** (kata sandi `password123`): `pemilik`, `budi` (penghuni), `rina` (calon penghuni).
+
+---
+
+## 9. Pembayaran QRIS (Midtrans Sandbox)
+
+Penghuni membayar tagihan dengan **QRIS dinamis**: nominal diambil otomatis dari tabel `tagihan`, setiap klik "Bayar dengan QRIS" membuat `order_id` unik yang berlaku 15 menit, dan status tagihan berubah sendiri lewat callback Midtrans. Sandbox tidak memakai uang sungguhan.
+
+**Alur:** `penghuni/tagihan/{id}/bayar` → tombol *Bayar dengan QRIS* → `penghuni/pembayaran/{id}` (kode QR + hitung mundur, status dicek tiap 3 detik) → Midtrans memanggil `POST /pembayaran/callback` → pembayaran `berhasil`, tagihan `lunas`, notifikasi ke penghuni dan pemilik.
+
+> Untuk kartu halaman tagihan: tombol "Bayar" cukup diarahkan ke `site_url('penghuni/tagihan/' . $id_tagihan . '/bayar')`.
+
+### Langkah uji lokal
+
+1. **Daftar akun sandbox** di https://dashboard.sandbox.midtrans.com (gratis). Buka *Settings → Access Keys*, salin **Server Key** (diawali `SB-Mid-server-`).
+2. **Isi `.env`** (bukan `.env.example`, dan jangan di-commit):
+   ```
+   MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxxxxxxxxx
+   MIDTRANS_IS_PRODUCTION=false
+   ```
+3. **Siapkan database.** Import `kos15.sql` di phpMyAdmin. Tabel `pembayaran` dan `notifikasi` sudah ada di file itu, jadi tidak perlu migrate. Pastikan `database.default.database` di `.env` sama dengan nama database hasil import (`db_kos`).
+4. **Jalankan server:** `php spark serve` (http://localhost:8080).
+5. **Buka ngrok** supaya Midtrans bisa memanggil laptopmu:
+   ```bash
+   ngrok http 8080
+   ```
+   Salin alamat `https://xxxx.ngrok-free.app` yang muncul.
+6. **Atur Payment Notification URL** di dashboard sandbox: *Settings → Payment → Notification URL* →
+   `https://xxxx.ngrok-free.app/index.php/pembayaran/callback` (tanpa `index.php/` jika `indexPage` sudah dikosongkan).
+7. **Coba bayar.** Login `sari` / `password123`, buka http://localhost:8080/penghuni/tagihan/5/bayar, klik *Bayar dengan QRIS*.
+8. **Bayar di simulator.** Buka https://simulator.sandbox.midtrans.com/v2/qris/index, tempel URL gambar QR (klik kanan gambar QR → *Copy image address*), lalu bayar. Dalam beberapa detik halaman berubah sendiri menjadi **Pembayaran berhasil**.
+
+### Uji tanpa ngrok (callback manual)
+
+Hitung signature lalu kirim callback palsu dari terminal:
+
+```bash
+php -r "echo hash('sha512', 'ORDER_ID' . '200' . '127500.00' . 'SERVER_KEY');"
+curl -X POST http://localhost:8080/index.php/pembayaran/callback -H "Content-Type: application/json" \
+  -d '{"order_id":"ORDER_ID","status_code":"200","gross_amount":"127500.00","transaction_status":"settlement","signature_key":"HASIL_HASH"}'
+```
+
+Ganti `ORDER_ID` dengan isi kolom `pembayaran.order_id`. Signature salah dibalas **403** tanpa mengubah data. Callback yang sama dikirim dua kali tetap dibalas **200**, dan yang kedua tidak mengubah apa pun.
+
+### Log
+
+Callback yang gagal (signature salah, order tidak dikenal, nominal berbeda, JSON rusak, error database) dicatat di `writable/logs/log-YYYY-MM-DD.log` dengan awalan `Callback QRIS gagal`.
+
+### Pemetaan status Midtrans
+
+| `transaction_status` | `pembayaran.status_pembayaran` | `tagihan.status_tagihan` |
+| --- | --- | --- |
+| `settlement` / `capture` | `berhasil` | `lunas` |
+| `expire` | `kedaluwarsa` | tetap `belum_bayar` |
+| `cancel` / `deny` / `failure` | `gagal` | tetap `belum_bayar` |
+| `pending` | tidak berubah | tidak berubah |
+
+### Memakai Duitku (pilihan kedua)
+
+Kode mendukung **Midtrans** dan **Duitku**. Gateway dipilih di `.env`, kodenya tidak perlu diubah:
+
+```
+PAYMENT_GATEWAY=duitku
+DUITKU_MERCHANT_CODE=DSxxxxx        # dashboard Duitku > Project
+DUITKU_API_KEY=xxxxxxxx             # JANGAN di-commit / dibagikan
+DUITKU_IS_PRODUCTION=false          # true = uang sungguhan (passport.duitku.com)
+DUITKU_METODE_QRIS=SP               # SP ShopeePay QRIS, NQ Nobu QRIS, LQ LinkAja QRIS (yang aktif di project)
+DUITKU_CALLBACK_URL=                # opsional, mis. https://xxxx.ngrok-free.dev/index.php/pembayaran/callback-duitku
+```
+
+- Duitku mengirim isi QR (`qrString`), lalu halaman menggambarnya dengan `public/js/qrcode-generator.js` (MIT).
+- Callback Duitku masuk ke `POST /pembayaran/callback-duitku`, dengan signature `MD5(merchantCode + amount + merchantOrderId + apiKey)`.
+- `order_id` Duitku diawali `KOSD-` dan Midtrans `KOS-`, sehingga pembayaran lama tetap dicek ke gateway yang benar walau `.env` diganti.
+
+### Tanpa ngrok: cek status otomatis
+
+Selama halaman QR terbuka dan status masih *menunggu*, aplikasi **menanyakan status langsung ke gateway** paling sering sekali per 10 detik (Midtrans `GET /v2/{order_id}/status`, Duitku `transactionStatus`). Jadi tagihan tetap berubah menjadi lunas walau callback tidak sampai ke laptop. Callback tetap jalur utama, dan keduanya diproses oleh `PembayaranService` yang sama (idempoten, notifikasi hanya sekali).
+
+---
+
+## 10. Notifikasi dan Pengingat Harian
+
+### Perintah pengingat
+
+```bash
+php spark pengingat:kirim                         # tanggal hari ini (WIB)
+php spark pengingat:kirim --tanggal=2026-11-22    # uji seolah-olah hari ini 22 Nov 2026
+php spark pengingat:kirim --tanggal=2026-11-22 --coba   # hanya tampilkan, tidak menyimpan
+```
+
+- Mengambil tagihan **belum_bayar** yang jatuh tempo tepat H-7, H-3, dan H-1. Angka harinya dibaca dari `info_kos.jadwal_pengingat` (bawaan `7,3,1`).
+- **Tidak ganda:** tagihan yang sudah punya pengingat `(H-n)` yang sama, atau sudah diberi pengingat pada tanggal itu, dilewati. Menjalankan perintah dua kali sehari aman.
+- **Berhenti saat lunas:** tagihan `lunas` tidak pernah diambil lagi.
+- Hasil setiap putaran tercatat di `writable/logs` (`pengingat:kirim ...: n dikirim, n dilewati`).
+
+Contoh uji dengan data `kos15.sql` (tagihan 5 milik `sari`, jatuh tempo 25 Nov 2026):
+
+| Tanggal uji | Hasil |
+| --- | --- |
+| `--tanggal=2026-11-18` | H-7 dilewati, karena data contoh sudah punya pengingat H-7 |
+| `--tanggal=2026-11-22` | H-3 dikirim ke Sari. Dijalankan ulang, dilewati |
+| `--tanggal=2026-11-24` | H-1 dikirim, atau tidak ada jika tagihan sudah dilunasi |
+
+### Notifikasi untuk pemilik (dipakai kartu lain)
+
+```php
+$notif = new \App\Libraries\NotifikasiService();
+$notif->pemesananBaru('PSN-00003', 'Rina Wulandari', 'K-05', '2026-12-01');
+$notif->pembayaranTunai($idTagihan, 'Budi Santoso', 'K-01', 20000);
+$notif->perpanjanganBaru('Budi Santoso', 'K-01', '2027-08-01');
+$notif->laporanKerusakan($idLaporan, 'Sari Lestari', 'K-02', 'Lampu kamar mati');
+```
+
+Setiap fungsi mengirim ke semua akun pemilik. Klik notifikasi (lonceng atau halaman `/notifikasi`) akan menandainya **sudah dibaca** lalu membuka halaman terkait. Jika halaman itu belum dibuat, pengguna kembali ke `/notifikasi`.
+
+### Menjadwalkan di Task Scheduler Windows
+
+1. Tekan **Win**, ketik **Task Scheduler**, buka.
+2. Di panel kanan klik **Create Basic Task…**
+   - Name: `Kos15 Pengingat Tagihan`, lalu **Next**.
+3. Trigger: **Daily**, lalu **Next**. Start: jam `07:00:00`, Recur every `1` days, lalu **Next**.
+4. Action: **Start a program**, lalu **Next**:
+   - Program/script: `C:\xampp\php\php.exe`
+   - Add arguments: `spark pengingat:kirim`
+   - Start in: `C:\xampp\htdocs\kos15`  ← wajib, folder yang berisi file `spark`
+5. **Finish**. Pastikan MySQL XAMPP menyala pada jam itu.
+6. Uji sekarang: klik kanan task → **Run**, lalu cek `writable/logs` atau lonceng notifikasi.
+
+Atau lewat Command Prompt (Run as administrator), satu baris:
+
+```bat
+schtasks /Create /SC DAILY /ST 07:00 /TN "Kos15 Pengingat Tagihan" /TR "cmd /c cd /d C:\xampp\htdocs\kos15 && C:\xampp\php\php.exe spark pengingat:kirim"
+```
+
+Hapus jadwal: `schtasks /Delete /TN "Kos15 Pengingat Tagihan" /F`
+
+## 11. Halaman Tagihan, Pembayaran, dan Notifikasi
+
+Semua URL di bawah sama dengan menu sidebar (`partials/sidebar_penghuni.php`, `partials/sidebar_pemilik.php`)
+dan `app/Config/Menu.php`, jadi klik menu langsung membuka halamannya.
+Halaman penghuni memakai `layouts/penghuni`, halaman pemilik memakai `layouts/pemilik`.
+
+| URL | Halaman | File |
+| --- | --- | --- |
+| `penghuni/tagihan` | Tagihan Saya (menu **Tagihan**) | `Controllers/Penghuni/Tagihan.php`, `Views/penghuni/tagihan.php` |
+| `penghuni/bayar` | Tombol **Bayar Tagihan**: buka tagihan belum bayar terdekat | `Penghuni/Tagihan::bayar` |
+| `penghuni/tagihan/{id}/bayar` | Bayar Tagihan (pilih tagihan, QRIS, ringkasan) | `Penghuni/Pembayaran::pilih`, `Views/pembayaran/pilih.php` |
+| `penghuni/pembayaran/{id}` | Kode QRIS + status otomatis | `Views/pembayaran/qris.php` |
+| `penghuni/riwayat` | Riwayat Pembayaran (menu **Riwayat Pembayaran**), cari + filter status | `Views/penghuni/riwayat.php` |
+| `penghuni/riwayat/unduh` | Unduh Rekap (CSV, bisa dibuka di Excel) | `Penghuni/Tagihan::unduhRekap` |
+| `penghuni/pembayaran/{id}/kwitansi` | Kwitansi siap cetak (hanya pembayaran berhasil) | `Views/penghuni/kwitansi.php` |
+| `pemilik/tagihan` | Pantau tagihan semua penghuni (menu **Tagihan Bulanan**) | `Controllers/Pemilik/Tagihan.php`, `Views/pemilik/tagihan/index.php` |
+| `notifikasi` | Notifikasi semua peran, chip Semua / Belum dibaca | `Views/notifikasi/index.php`, lonceng `Cells/lonceng.php` |
+
+Tagihan DP (50% harga sewa tahunan, jatuh tempo 3 hari) dan pelunasan dibuat otomatis oleh `Libraries/TagihanService.php`
+saat pemilik menyetujui pemesanan. Setelah DP dan pelunasan lunas, status sewa berubah dari `menunggu_pembayaran` menjadi `aktif`.
+Gaya halaman ini ada di bagian akhir `public/css/kos15.css` (kelas baru saja, gaya lama tidak diubah).

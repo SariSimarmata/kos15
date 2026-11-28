@@ -46,15 +46,41 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     $routes->get('pemesanan', 'Pemesanan::daftar');
     $routes->post('pemesanan/(:num)/setujui', 'Pemesanan::setujui/$1');
     $routes->post('pemesanan/(:num)/tolak', 'Pemesanan::tolak/$1');
+
+    // Kartu tagihan & pembayaran: pantau tagihan penghuni (menu "Tagihan")
+    $routes->get('tagihan', 'Pemilik\Tagihan::index');
 });
 
 // Penghuni
 $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($routes) {
-    $routes->get('tagihan', 'Sementara::tagihanPenghuni'); // SEMENTARA
+    // Kartu tagihan & pembayaran. URL sama dengan menu di partials/sidebar_penghuni.php
+    $routes->get('tagihan', 'Penghuni\Tagihan::index');                       // menu "Tagihan"
+    $routes->get('bayar', 'Penghuni\Tagihan::bayar');                         // tombol "Bayar Tagihan"
+    $routes->get('riwayat', 'Penghuni\Tagihan::riwayat');                     // menu "Riwayat Bayar"
+    $routes->get('riwayat/unduh', 'Penghuni\Tagihan::unduhRekap');            // tombol "Unduh Rekap"
+    $routes->get('pembayaran/(:num)/kwitansi', 'Penghuni\Tagihan::kwitansi/$1');
+
+    // Kartu pembayaran QRIS. Tombol "Bayar" di halaman tagihan cukup menuju penghuni/tagihan/{id}/bayar
+    $routes->get('tagihan/(:num)/bayar', 'Penghuni\Pembayaran::pilih/$1');
+    $routes->post('tagihan/(:num)/qris', 'Penghuni\Pembayaran::buatQris/$1');
+    $routes->get('pembayaran/(:num)', 'Penghuni\Pembayaran::qris/$1');
+    $routes->get('pembayaran/(:num)/status', 'Penghuni\Pembayaran::status/$1'); // JSON untuk polling
 
     // Masa sewa (Kartu 4 Sprint 4)
     $routes->get('sewa', 'Penghuni\Sewa::index');
 });
+
+// Notifikasi untuk semua peran yang sudah login (kartu Notifikasi dan Pengingat Harian)
+$routes->group('notifikasi', ['filter' => 'peran'], static function ($routes) {
+    $routes->get('/', 'Notifikasi::index');
+    $routes->get('(:num)/buka', 'Notifikasi::buka/$1');
+    $routes->post('baca-semua', 'Notifikasi::bacaSemua');
+});
+
+// Callback Midtrans (kartu pembayaran QRIS). Dipanggil server Midtrans, jadi TANPA filter login
+// dan dikecualikan dari CSRF di Config/Filters.php. Keamanannya lewat cek signature.
+$routes->post('pembayaran/callback', 'PaymentCallback::index');
+$routes->post('pembayaran/callback-duitku', 'DuitkuCallback::index');
 
 // Katalog publik (Kartu 7). Bisa dibuka tanpa login, jadi tanpa filter.
 $routes->get('katalog', 'Katalog::index');

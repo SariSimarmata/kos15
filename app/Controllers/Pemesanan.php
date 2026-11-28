@@ -265,6 +265,9 @@ class Pemesanan extends BaseController
                 'status_sewa'      => 'menunggu_pembayaran',
             ]), 'buat sewa');
 
+            // 3b. Tagihan DP + pelunasan untuk sewa ini (kartu tagihan & pembayaran)
+            (new \App\Libraries\TagihanService())->siapkanTagihanAwal((int) model(SewaModel::class)->getInsertID());
+
             // 4. Peran calon menjadi penghuni
             $this->harusBerhasil($db->table('pengguna')
                 ->where('id_pengguna', (int) $calon['id_pengguna'])

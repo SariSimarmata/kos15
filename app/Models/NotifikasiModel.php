@@ -56,6 +56,7 @@ class NotifikasiModel extends Model
      * @param string   $pesan      Isi notifikasi
      * @param int|null $idTagihan  Opsional, hanya untuk jenis tagihan, denda, pembayaran
      * @param int|null $idLaporan  Opsional, hanya untuk jenis aduan
+     * @param string|null $waktuKirim Opsional (Y-m-d H:i:s WIB), dipakai uji pengingat --tanggal
      *
      * @return int ID notifikasi yang baru dibuat
      *
@@ -66,7 +67,8 @@ class NotifikasiModel extends Model
         string $jenis,
         string $pesan,
         ?int $idTagihan = null,
-        ?int $idLaporan = null
+        ?int $idLaporan = null,
+        ?string $waktuKirim = null
     ): int {
         if (! in_array($jenis, self::JENIS, true)) {
             throw new InvalidArgumentException('Jenis notifikasi tidak valid: ' . $jenis);
@@ -91,10 +93,55 @@ class NotifikasiModel extends Model
             'id_laporan'       => $idLaporan,
             'jenis_notifikasi' => $jenis,
             'pesan'            => $pesan,
-            'waktu_kirim'      => date('Y-m-d H:i:s'),
+            // appTimezone = UTC, jadi waktu dibuat eksplisit dalam WIB supaya lonceng menampilkan jam yang benar
+            'waktu_kirim'      => $waktuKirim ?? self::sekarangWib(),
             'status_baca'      => 0,
         ]);
 
         return (int) $this->getInsertID();
+    }
+
+    // ------------------------------------------------------------------
+    //  Kartu notifikasi & pengingat harian
+    // ------------------------------------------------------------------
+
+    /** Waktu sekarang dalam WIB, format kolom DATETIME. */
+    public static function sekarangWib(): string
+    {
+        return (new \DateTimeImmutable('now', new \DateTimeZone('Asia/Jakarta')))->format('Y-m-d H:i:s');
+    }
+
+    /** Notifikasi milik satu pengguna, terbaru dulu (untuk halaman Notifikasi). */
+    public function milikPengguna(int $idPengguna, int $perHalaman = 20, bool $belumDibacaSaja = false): array
+    {
+        if ($belumDibacaSaja) {
+            $this->where('status_baca', 0);
+        }
+
+        return $this->where('id_pengguna', $idPengguna)
+            ->orderBy('waktu_kirim', 'DESC')
+            ->orderBy('id_notifikasi', 'DESC')
+            ->paginate($perHalaman);
+    }
+
+    /** Tandai satu notifikasi sudah dibaca, hanya jika milik pengguna ini. */
+    public function tandaiDibaca(int $idNotifikasi, int $idPengguna): void
+    {
+        $this->builder()
+            ->where('id_notifikasi', $idNotifikasi)
+            ->where('id_pengguna', $idPengguna)
+            ->where('status_baca', 0)
+            ->update(['status_baca' => 1]);
+    }
+
+    /** Tandai semua notifikasi milik pengguna ini sudah dibaca. Mengembalikan jumlah yang berubah. */
+    public function tandaiSemuaDibaca(int $idPengguna): int
+    {
+        $this->builder()
+            ->where('id_pengguna', $idPengguna)
+            ->where('status_baca', 0)
+            ->update(['status_baca' => 1]);
+
+        return $this->db->affectedRows();
     }
 }

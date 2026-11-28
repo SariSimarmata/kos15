@@ -837,6 +837,150 @@ body.panel-pemilik .lencana { font-size: 12px; line-height: 18px; padding: 4px 1
 .thumb-kamar img { width: 100%; height: 100%; object-fit: cover; }
 .baris-info .angka-dp { font-family: var(--kos-font-judul); font-weight: 700; font-size: 1.15rem; color: var(--kos-primer); }
 
+   Tagihan, Pembayaran, Riwayat, Notifikasi (kartu tagihan & pembayaran)
+   Mengikuti desain "Halaman Penghuni" dan "Komponen: Badge Status dan Notifikasi".
+   Hanya menambah kelas baru; gaya lama tidak diubah.
+   ========================================================================== */
+
+.subjudul-halaman { color: var(--kos-redup); font-size: .9rem; margin-bottom: 0; }
+
+/* Kartu angka ringkas: ikon kotak, label, angka besar, catatan */
+.kartu-statistik {
+    background: #fff;
+    border: 1px solid var(--kos-garis);
+    border-radius: 12px;
+    padding: 1.25rem;
+    height: 100%;
+}
+.ikon-kotak {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--kos-primer-muda);
+    color: var(--kos-primer);
+    font-size: 1.05rem;
+    margin-bottom: .75rem;
+}
+.kartu-statistik .label { color: var(--kos-redup); font-size: .8rem; }
+.kartu-statistik .angka {
+    font-family: var(--kos-font-judul);
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: var(--kos-judul);
+    line-height: 1.3;
+}
+.kartu-statistik .catatan { font-size: .75rem; color: var(--kos-redup); }
+.teks-merah  { color: var(--kos-merah) !important; }
+.teks-kuning { color: #B4600B !important; }
+.teks-hijau  { color: var(--kos-hijau) !important; }
+
+/* Kartu putih berjudul (Daftar Tagihan, Ringkasan Pembayaran, ...) */
+.kartu-putih {
+    background: #fff;
+    border: 1px solid var(--kos-garis);
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem 1rem;
+}
+.kartu-putih .judul-kartu { font-family: var(--kos-font-teks); font-weight: 600; font-size: 1rem; color: var(--kos-judul); margin-bottom: .15rem; }
+
+/* Tabel bersih: kepala abu kecil, garis tipis antar baris */
+.tabel-kos { width: 100%; margin: 0; border-collapse: collapse; font-size: .875rem; }
+.tabel-kos th {
+    color: var(--kos-redup);
+    font-weight: 500;
+    font-size: .8rem;
+    padding: .75rem .5rem;
+    border-bottom: 1px solid var(--kos-garis);
+    white-space: nowrap;
+}
+.tabel-kos td { padding: .85rem .5rem; border-bottom: 1px solid var(--kos-garis); vertical-align: middle; color: var(--kos-judul); }
+.tabel-kos tr:last-child td { border-bottom: 0; }
+.tabel-kos .sub { display: block; color: var(--kos-redup); font-size: .75rem; }
+.tabel-kos .nominal { font-weight: 600; white-space: nowrap; }
+
+/* Tombol aksi kecil putih bergaris: Bayar, Lihat, Kwitansi */
+.btn-aksi {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3rem .7rem;
+    border: 1px solid var(--kos-garis);
+    border-radius: var(--kos-radius-kecil);
+    background: #fff;
+    color: var(--kos-judul);
+    font-size: .8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.btn-aksi:hover { border-color: var(--kos-primer); color: var(--kos-primer); }
+
+/* Pilihan tagihan di halaman Bayar Tagihan */
+.pilih-tagihan {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .9rem 1rem;
+    border: 1px solid var(--kos-garis);
+    border-radius: 10px;
+    background: #fff;
+    color: inherit;
+}
+.pilih-tagihan:hover { border-color: var(--kos-primer); }
+.pilih-tagihan.aktif { border-color: var(--kos-primer); background: #F7FAFC; }
+.pilih-tagihan .centang {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1.5px solid var(--kos-garis);
+    background: #fff;
+    color: #fff;
+    font-size: .8rem;
+}
+.pilih-tagihan.aktif .centang { background: var(--kos-primer); border-color: var(--kos-primer); }
+.pilih-tagihan .nama { font-weight: 500; color: var(--kos-judul); font-size: .9rem; }
+.pilih-tagihan .sub { display: block; color: var(--kos-redup); font-size: .75rem; }
+
+.kotak-metode { background: #EEF2F6; border-radius: 10px; padding: 1rem 1.1rem; }
+.judul-langkah { font-weight: 600; font-size: .95rem; color: var(--kos-judul); margin-bottom: .75rem; }
+
+/* Daftar notifikasi: titik biru = belum dibaca */
+.notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .9rem 1rem;
+    border-radius: 10px;
+    color: inherit;
+}
+.notif-item + .notif-item { margin-top: .5rem; }
+.notif-item.baru { background: var(--kos-primer-muda); }
+.notif-item:not(.baru) { border: 1px solid var(--kos-garis); }
+.notif-item:hover { box-shadow: 0 1px 6px rgba(38, 55, 70, .08); }
+.notif-titik { flex: 0 0 8px; width: 8px; height: 8px; margin-top: .45rem; border-radius: 50%; background: transparent; }
+.notif-item.baru .notif-titik { background: var(--kos-primer); }
+.notif-item .judul { color: var(--kos-judul); font-size: .9rem; }
+.notif-item.baru .judul { font-weight: 600; }
+.notif-item .meta { color: var(--kos-redup); font-size: .75rem; }
+.notif-item .kanan { margin-left: auto; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; }
+
+/* Lonceng navbar: daftar ringkas */
+.dropdown-notif { width: 340px; max-width: 92vw; padding: .5rem; border-radius: 12px; }
+.dropdown-notif .notif-item { padding: .65rem .75rem; }
+
+/* Kwitansi siap cetak */
+@media print {
+    .navbar-kos, .sidebar-pemilik, .topbar-pemilik, .jangan-cetak { display: none !important; }
+    body { background: #fff !important; }
+    .kartu-putih { border: 0; }
+}
+=======
 /* =====================================================================
  * DATA PENGHUNI DAN MASA SEWA (Kartu 4 Sprint 4)
  * ===================================================================== */
@@ -885,3 +1029,4 @@ body.panel-pemilik .lencana { font-size: 12px; line-height: 18px; padding: 4px 1
 .nomor-kamar-besar { font-family: var(--kos-font-judul); font-weight: 700; font-size: 1.75rem; color: var(--kos-judul); }
 .banner-peringatan { background: var(--kos-kuning-muda); color: var(--kos-kuning); }
 .progress-bar { background-color: var(--kos-primer); }
+/* ===================================================================
