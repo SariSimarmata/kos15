@@ -8,7 +8,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 class Auth extends BaseController
 {
     /** Halaman tujuan setelah login sesuai peran. */
-    private const TUJUAN = [
+    public const TUJUAN = [
         'pemilik' => 'pemilik/dashboard',
         'penghuni' => 'penghuni/tagihan',
         'calon_penghuni' => 'katalog',

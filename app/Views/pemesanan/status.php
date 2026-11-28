@@ -1,4 +1,5 @@
-<?= $this->extend('layouts/main') ?>
+<?php $penghuni = session('role') === 'penghuni'; ?>
+<?= $this->extend($penghuni ? 'layouts/penghuni' : 'layouts/main') ?>
 
 <?= $this->section('content') ?>
 <?php
@@ -12,7 +13,9 @@ $lencana = [
 
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <h1 class="judul-halaman mb-0">Status Pengajuan</h1>
-    <a href="<?= site_url('pemesanan/baru') ?>" class="btn btn-outline-primary">Pesan Kamar</a>
+    <?php if (! $penghuni): ?>
+        <a href="<?= site_url('pemesanan/baru') ?>" class="btn btn-outline-primary">Pesan Kamar</a>
+    <?php endif; ?>
 </div>
 
 <?php if (empty($pemesanan)): ?>
@@ -27,8 +30,15 @@ $lencana = [
     <div class="card p-4 mb-3">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
             <div>
-                <div class="teks-kecil">Nomor pemesanan</div>
-                <div class="h5 mb-0"><?= esc(\App\Models\PemesananModel::nomor((int) $p['id_pemesanan'])) ?></div>
+                <?php if ($status === 'approved'): ?>
+                    <div class="teks-kecil">Nomor pemesanan</div>
+                    <div class="h5 mb-0"><?= esc(\App\Models\PemesananModel::nomor((int) $p['id_pemesanan'])) ?></div>
+                <?php else: ?>
+                    <div class="h5 mb-0">Kamar <?= esc($p['nomor_kamar']) ?></div>
+                    <?php if ($status === 'pending'): ?>
+                        <div class="teks-kecil">Nomor pemesanan terbit setelah disetujui pemilik</div>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
             <span class="lencana <?= $kelas ?>"><?= esc($label) ?></span>
         </div>
