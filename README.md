@@ -97,8 +97,8 @@ git push -u origin fitur/nama-kartu
 | `pemesanan.status_pengajuan`         | `pending`, `approved`, `rejected`                            |
 | `sewa.status_sewa`                   | `menunggu_pembayaran`, `aktif`, `selesai`, `dibatalkan`      |
 | `pengajuan_perpanjangan.status`      | `menunggu`, `disetujui`, `ditolak`                           |
-| `tagihan.jenis_tagihan`              | `dp`, `pelunasan`, `tagihan_bulanan`, `denda_piket`          |
-| `tagihan.status_tagihan`             | `belum_bayar`, `lunas`, `dibatalkan`                         |
+| `tagihan.jenis_tagihan`              | `dp`, `pelunasan`, `listrik_air`, `denda_piket`, `menginap_pengunjung` |
+| `tagihan.status_tagihan`             | `belum_bayar`, `lunas`                                       |
 | `pembayaran.metode`                  | `qris`, `tunai`                                              |
 | `pembayaran.status_pembayaran`       | `menunggu`, `berhasil`, `kedaluwarsa`, `gagal`, `ditolak`    |
 | `piket.status_piket`                 | `terjadwal`, `menunggu_verifikasi`, `selesai`, `tidak_piket` |
@@ -193,3 +193,48 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
 **Notifikasi** dikirim lewat `model(NotifikasiModel::class)->kirim($idPengguna, 'pemesanan', 'Pesan')`, lalu lonceng di navbar menghitungnya otomatis.
 
 **Akun uji** (kata sandi `password123`): `pemilik`, `budi` (penghuni), `rina` (calon penghuni).
+
+---
+
+## 9. Tagihan Sewa: Skema dan Jatuh Tempo (Kartu 3)
+
+Tagihan sewa dibuat **hanya** lewat satu method, supaya Kartu 5, 6, dan 11 memakai aturan yang sama:
+
+```php
+$dibuat = model(TagihanModel::class)->buatTagihanSewa($idSewa, 'dp');    // atau 'lunas'
+```
+
+Jangan `insert` tagihan `dp` / `pelunasan` dengan cara sendiri. Method ini aman dipanggil di dalam transaksi pemanggil (jika gagal ia melempar exception, lalu pemanggil yang `transRollback()`), menolak sewa yang sudah punya tagihan sewa, dan hanya menerima sewa berstatus `menunggu_pembayaran`. Harga selalu diambil dari `kamar.harga_sewa_tahunan`, bukan dari input pengguna.
+
+**Alur:** pemilik menyetujui pemesanan (Kartu 8), sewa berstatus `menunggu_pembayaran`, lalu penghuni membuka **Tagihan** dan memilih skema. Skema tidak bisa diubah setelah dipilih.
+
+### Nominal
+
+Semua nominal angka bulat rupiah, dan jumlah semua tagihan sewa selalu sama dengan harga sewa.
+
+| Skema                     | Tagihan yang dibuat                                                        |
+| ------------------------- | -------------------------------------------------------------------------- |
+| `dp` (DP 50% + pelunasan) | `dp` = harga ÷ 2 (dibulatkan ke bawah), `pelunasan` = sisanya              |
+| `lunas` (100%)            | satu tagihan `pelunasan` sebesar harga penuh                               |
+
+Contoh: harga Rp9.600.000 menjadi DP Rp4.800.000 + pelunasan Rp4.800.000. Harga ganjil Rp7.200.001 menjadi DP Rp3.600.000 + pelunasan Rp3.600.001.
+
+### Aturan jatuh tempo
+
+Aturan SRS: **pelunasan wajib dibayar sebelum tanggal mulai sewa.** Maka batas akhir semua tagihan sewa adalah **H-1 tanggal mulai sewa**.
+
+| Tagihan                                   | Jatuh tempo                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| DP (skema `dp`)                           | 3 hari setelah skema dipilih, tetapi tidak lewat H-1 tanggal mulai sewa  |
+| Pelunasan 100% (skema `lunas`)            | sama dengan DP: 3 hari setelah skema dipilih, paling lambat H-1          |
+| Pelunasan 50% (skema `dp`)                | H-1 tanggal mulai sewa                                                   |
+
+Aturan tambahan:
+
+- Jatuh tempo tidak pernah sebelum hari ini. Jika tanggal mulai sewa hari ini atau besok, H-1 sudah lewat atau jatuh hari ini, sehingga tagihan jatuh tempo **hari ini** (harus dibayar langsung).
+- Tanggal dihitung dengan zona waktu Asia/Jakarta (server memakai UTC).
+- Tagihan **lewat jatuh tempo** = belum lunas dan tanggal jatuh tempo **sebelum** hari ini. Di hari jatuh tempo sendiri status masih "Belum dibayar".
+
+Contoh: skema `dp` dipilih 28 Nov 2026, sewa mulai 1 Feb 2027 menjadi DP jatuh tempo 1 Des 2026 dan pelunasan jatuh tempo 31 Jan 2027. Jika sewa mulai 1 Des 2026, DP dan pelunasan sama-sama jatuh tempo 30 Nov 2026.
+
+Pengaturan angka ada di konstanta `TagihanModel::PERSEN_DP` dan `TagihanModel::HARI_JATUH_TEMPO_DP`.
