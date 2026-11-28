@@ -54,9 +54,11 @@ class Pembayaran extends BaseController
             return $this->aksesDitolak();
         }
 
-        $aktif = null;
+        $aktif         = null;
+        $tunaiMenunggu = null;
         if ($tagihan['status_tagihan'] === 'belum_bayar') {
-            $aktif = model(PembayaranModel::class)->qrisAktif($idTagihan, $this->sekarang()->format('Y-m-d H:i:s'));
+            $aktif         = model(PembayaranModel::class)->qrisAktif($idTagihan, $this->sekarang()->format('Y-m-d H:i:s'));
+            $tunaiMenunggu = model(PembayaranModel::class)->tunaiMenunggu($idTagihan); // pengajuan tunai (Kartu 6)
         }
 
         // Bagian "1. Pilih Tagihan": semua tagihan belum bayar milik penghuni ini
@@ -66,11 +68,12 @@ class Pembayaran extends BaseController
         ));
 
         return view('pembayaran/pilih', [
-            'judul'       => 'Bayar Tagihan',
-            'tagihan'     => $tagihan,
-            'belumBayar'  => $belumBayar,
-            'qrisAktif'   => $aktif,
-            'gatewaySiap' => PaymentGateway::aktif()->siap(),
+            'judul'         => 'Bayar Tagihan',
+            'tagihan'       => $tagihan,
+            'belumBayar'    => $belumBayar,
+            'qrisAktif'     => $aktif,
+            'tunaiMenunggu' => $tunaiMenunggu,
+            'gatewaySiap'   => PaymentGateway::aktif()->siap(),
         ]);
     }
 

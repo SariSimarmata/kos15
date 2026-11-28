@@ -18,7 +18,7 @@ $hariIni = (new DateTimeImmutable('now', new DateTimeZone('Asia/Jakarta')))->for
 
 <div class="header-halaman">
     <h1 class="judul-halaman mb-1">Bayar Tagihan</h1>
-    <p class="subjudul-halaman">Pilih tagihan yang ingin dibayar, lalu bayar dengan QRIS.</p>
+    <p class="subjudul-halaman">Pilih tagihan yang ingin dibayar, lalu bayar dengan QRIS atau tunai.</p>
 </div>
 
 <?php if ($lunas): ?>
@@ -71,7 +71,13 @@ $hariIni = (new DateTimeImmutable('now', new DateTimeZone('Asia/Jakarta')))->for
                     </span>
                     <i class="bi bi-check-circle-fill text-primary fs-5" aria-hidden="true"></i>
                 </div>
-                <p class="teks-kecil mt-2 mb-0">Mau bayar tunai? Serahkan langsung ke pemilik kos, lalu pemilik mengonfirmasi pembayaranmu.</p>
+                <div class="kotak-metode d-flex align-items-center gap-3 mt-2">
+                    <span class="ikon-kotak mb-0 bg-white"><i class="bi bi-cash" aria-hidden="true"></i></span>
+                    <span class="flex-grow-1">
+                        <span class="d-block fw-semibold">Tunai</span>
+                        <span class="teks-kecil">Serahkan uang langsung ke pemilik kos, lalu ajukan di sini. Tagihan lunas setelah pemilik mengonfirmasi.</span>
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -104,6 +110,27 @@ $hariIni = (new DateTimeImmutable('now', new DateTimeZone('Asia/Jakarta')))->for
                     <?php endif; ?>
                     <p class="teks-kecil text-center mt-2 mb-0">Kode QRIS berlaku 15 menit.</p>
                 </div>
+
+                <?php /* Bayar tunai (Kartu 6). $tunaiMenunggu dari Penghuni\Pembayaran::pilih(); aturannya di PembayaranService::ajukanTunai() */ ?>
+                <div class="border-top mt-3 pt-3">
+                    <?php if (! empty($tunaiMenunggu)): ?>
+                        <div class="banner-info mb-2">
+                            Pengajuan bayar tunai sudah dikirim
+                            <?= ! empty($tunaiMenunggu['tanggal_bayar']) ? 'pada ' . esc(tanggal_indonesia($tunaiMenunggu['tanggal_bayar'])) . ', ' . esc(date('H.i', strtotime($tunaiMenunggu['tanggal_bayar']))) . ' WIB' : '' ?>
+                            dan menunggu konfirmasi pemilik.
+                        </div>
+                        <a href="<?= site_url('penghuni/riwayat') ?>" class="btn btn-outline-primary w-100">Lihat di Riwayat</a>
+                    <?php else: ?>
+                        <form action="<?= site_url('penghuni/tagihan/' . $tagihan['id_tagihan'] . '/tunai') ?>" method="post" data-form-tunai
+                            onsubmit="return confirm('Ajukan bayar tunai <?= esc(rupiah($tagihan['jumlah_tagihan']), 'js') ?>? Pastikan uangnya sudah kamu serahkan ke pemilik.');">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-cash me-1" aria-hidden="true"></i> Ajukan Bayar Tunai
+                            </button>
+                        </form>
+                        <p class="teks-kecil text-center mt-2 mb-0">Lunas setelah pemilik mengonfirmasi.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -118,6 +145,15 @@ $hariIni = (new DateTimeImmutable('now', new DateTimeZone('Asia/Jakarta')))->for
             var tombol = form.querySelector('button[type="submit"]');
             tombol.disabled = true;
             tombol.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Membuat kode QRIS...';
+        });
+    });
+
+    // Cegah klik ganda: tombol tunai dikunci setelah pengajuan dikirim
+    document.querySelectorAll('[data-form-tunai]').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (e.defaultPrevented) return;
+            var tombol = form.querySelector('button[type="submit"]');
+            setTimeout(function () { tombol.disabled = true; }, 0);
         });
     });
 </script>

@@ -418,3 +418,29 @@ Bila tabel kosong, `ambil()` mengembalikan nilai bawaan (`id_info` = `null`) tan
 **Aturan validasi:** tarif tidak boleh negatif (nol boleh, maksimal 9.999.999.999); nomor WhatsApp diawali `08` atau `628` (spasi, strip, dan `+` dibuang otomatis); jadwal pengingat berisi 1 sampai 5 angka hari (1 sampai 30), disimpan urut turun tanpa duplikat; batas menginap 1 sampai 7 hari per minggu. Isi pengumuman 5 sampai 2000 karakter. Tanggal terbit diisi otomatis (WIB) dan tidak berubah saat diubah.
 
 Tes: `vendor/bin/phpunit tests/unit/InfoKosAturanTest.php tests/feature/HakAksesInfoKosTest.php`
+
+## 13. Pembayaran Tunai (Kartu 6)
+
+Penghuni mengajukan pembayaran tunai, pemilik mengonfirmasi atau menolak. Semua aturan ada di `Libraries/PembayaranService.php`,
+file yang sama dengan QRIS, jadi tagihan hanya bisa menjadi lunas lewat satu method (`lunasi()`).
+
+| URL | Siapa | File |
+| --- | --- | --- |
+| `POST penghuni/tagihan/{id}/tunai` | penghuni | `Penghuni/PembayaranTunai::ajukan`, tombol di `Views/pembayaran/pilih.php` |
+| `penghuni/riwayat` | penghuni | tunai tampil di Riwayat: *Menunggu konfirmasi* / *Berhasil* / *Ditolak* |
+| `penghuni/pembayaran/{id}/kwitansi` | penghuni | bukti pembayaran siap cetak, untuk tunai memuat nama pemilik yang mengonfirmasi |
+| `pemilik/konfirmasi-tunai` | pemilik | `Pemilik/KonfirmasiTunai`, `Views/pemilik/konfirmasi_tunai/index.php` |
+| `POST pemilik/konfirmasi-tunai/{id}/konfirmasi` dan `/tolak` | pemilik | `Pemilik/KonfirmasiTunai::konfirmasi`, `::tolak` |
+
+| Aksi | `PembayaranService` | `pembayaran` | `tagihan` | Notifikasi |
+| --- | --- | --- | --- | --- |
+| Penghuni mengajukan | `ajukanTunai()` | baris baru: `metode = tunai`, `status_pembayaran = menunggu` | tidak berubah (`belum_bayar`) | semua pemilik |
+| Pemilik konfirmasi | `konfirmasiTunai()` | `berhasil`, `id_konfirmator` terisi | `lunas` (lewat `lunasi()`) | penghuni dan pemilik lain |
+| Pemilik tolak | `tolakTunai()` | `gagal`, `id_konfirmator` terisi | tetap `belum_bayar` | penghuni (memuat alasan) |
+
+Catatan:
+- **Pengajuan ganda dicegah** jika tagihan masih punya pembayaran tunai yang menunggu, atau kode QRIS yang masih berlaku. Baris tagihan dikunci (`SELECT ... FOR UPDATE`) seperti pada pembuatan QRIS.
+- Jika tagihan lunas lewat QRIS, pengajuan tunai yang masih menunggu otomatis menjadi `kedaluwarsa` (aturan lama di `lunasi()`).
+- Tabel `pembayaran` tidak punya kolom alasan penolakan, jadi alasan dikirim lewat notifikasi ke penghuni.
+- `tanggal_bayar` untuk tunai diisi waktu pengajuan, lalu diganti waktu konfirmasi saat berhasil. `order_id` berawalan `TUNAI-` dipakai sebagai nomor bukti.
+- Test case: `docs/05_test_case.csv` (5 skenario: ajukan, konfirmasi, tolak, ajukan ganda, bukti tampil). Akun uji dari `kos15.sql`: `pemilik`, `budi`, `sari` (kata sandi `password123`).

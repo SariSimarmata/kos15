@@ -72,12 +72,22 @@ $sekarang = (new DateTimeImmutable('now', new DateTimeZone('Asia/Jakarta')))->fo
                         <?php
                         [$kelas, $teks] = $lencana[$b['status_pembayaran']] ?? ['lencana-abu', $b['status_pembayaran']];
                         $waktu = $b['tanggal_bayar'] ?: $b['waktu_kedaluwarsa'];
+
+                        // Tunai (Kartu 6): pengajuan menunggu konfirmasi pemilik, atau ditolak pemilik
+                        $tunai = $b['metode'] === 'tunai';
+                        if ($tunai && $b['status_pembayaran'] === 'menunggu') {
+                            $teks = 'Menunggu konfirmasi';
+                        } elseif ($tunai && $b['status_pembayaran'] === 'gagal') {
+                            $teks = 'Ditolak';
+                        }
+                        // Tunai yang belum berhasil: tanggalnya adalah waktu pengajuan
+                        $awalanWaktu = $b['tanggal_bayar'] ? ($tunai && $b['status_pembayaran'] !== 'berhasil' ? 'diajukan ' : '') : 'batas bayar ';
                         ?>
                         <tr>
                             <td>
                                 <?= $waktu ? esc(tanggal_indonesia($waktu)) : '–' ?>
                                 <?php if ($waktu): ?>
-                                    <span class="sub"><?= $b['tanggal_bayar'] ? '' : 'batas bayar ' ?><?= esc(date('H.i', strtotime($waktu))) ?> WIB</span>
+                                    <span class="sub"><?= $awalanWaktu ?><?= esc(date('H.i', strtotime($waktu))) ?> WIB</span>
                                 <?php endif; ?>
                             </td>
                             <td>
