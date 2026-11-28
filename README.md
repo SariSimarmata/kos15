@@ -389,3 +389,32 @@ Semua halaman penghuni memakai `layouts/penghuni`.
 
 Setelah tagihan DP dan pelunasan lunas, status sewa berubah dari `menunggu_pembayaran` menjadi `aktif` (`PembayaranService`).
 Gaya halaman ini ada di bagian akhir `public/css/kos15.css` (kelas baru saja, gaya lama tidak diubah).
+
+## 12. Info Kos, Tarif, dan Pengumuman
+
+Tabel `info_kos` **hanya berisi satu baris**. Kartu lain mengambil tarif lewat satu method ini, jangan `first()` atau `insert()` sendiri:
+
+```php
+$info = model(\App\Models\InfoKosModel::class)->ambil();
+
+$info['tarif_listrik_per_kwh'];      // float, rupiah per kWh
+$info['tarif_air_per_m3'];           // float, rupiah per m³
+$info['denda_piket_per_hari'];       // float
+$info['tarif_menginap_per_hari'];    // float
+$info['batas_menginap_per_minggu'];  // int, 1 sampai 7
+$info['pengingat'];                  // [7, 3, 1] (hari sebelum jatuh tempo)
+$info['no_whatsapp'];                // mis. 081234567890
+```
+
+Bila tabel kosong, `ambil()` mengembalikan nilai bawaan (`id_info` = `null`) tanpa menulis ke database. Mengubah data hanya lewat `InfoKosModel::simpanInfo()`, yang selalu mengubah baris yang ada.
+
+| Halaman                         | Alamat                        | Siapa                         |
+| ------------------------------- | ----------------------------- | ----------------------------- |
+| Info kos dan tarif              | `/pemilik/info-kos`           | pemilik                       |
+| Kelola pengumuman dan peraturan | `/pemilik/pengumuman`         | pemilik                       |
+| Baca pengumuman dan peraturan   | `/pengumuman`                 | penghuni dan calon penghuni   |
+| Peraturan di detail kamar       | `/katalog/{id}`               | semua (Kartu 7)               |
+
+**Aturan validasi:** tarif tidak boleh negatif (nol boleh, maksimal 9.999.999.999); nomor WhatsApp diawali `08` atau `628` (spasi, strip, dan `+` dibuang otomatis); jadwal pengingat berisi 1 sampai 5 angka hari (1 sampai 30), disimpan urut turun tanpa duplikat; batas menginap 1 sampai 7 hari per minggu. Isi pengumuman 5 sampai 2000 karakter. Tanggal terbit diisi otomatis (WIB) dan tidak berubah saat diubah.
+
+Tes: `vendor/bin/phpunit tests/unit/InfoKosAturanTest.php tests/feature/HakAksesInfoKosTest.php`

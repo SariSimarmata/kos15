@@ -39,6 +39,7 @@ class Menu extends BaseConfig
     public array $calon_penghuni = [
         'katalog'             => 'Katalog',
         'pemesanan/status'    => 'Status Pengajuan',
+        'pengumuman'          => 'Pengumuman',
     ];
 
     /** Menu untuk tamu yang belum login. */
