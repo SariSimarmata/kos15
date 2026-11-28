@@ -74,7 +74,8 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            'csrf',
+            // Callback Midtrans datang dari server luar tanpa token CSRF (dijaga signature)
+            'csrf' => ['except' => ['pembayaran/callback', 'pembayaran/callback-duitku']],
             // 'invalidchars',
         ],
         'after' => [

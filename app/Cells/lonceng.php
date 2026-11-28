@@ -9,21 +9,30 @@
         <?php endif; ?>
     </button>
 
-    <div class="dropdown-menu dropdown-menu-end shadow-sm p-0" style="width: 320px;">
-        <div class="px-3 py-2 border-bottom fw-semibold">Notifikasi</div>
+    <div class="dropdown-menu dropdown-menu-end shadow-sm dropdown-notif">
+        <div class="d-flex justify-content-between align-items-center px-2 pt-1 pb-2">
+            <span class="fw-semibold">Notifikasi</span>
+            <?php if ($jumlahBelumDibaca > 0): ?>
+                <span class="lencana lencana-biru"><?= esc($jumlahBelumDibaca) ?> baru</span>
+            <?php endif; ?>
+        </div>
 
         <?php if ($terbaru === []): ?>
-            <div class="px-3 py-3 text-muted small">Belum ada notifikasi.</div>
+            <div class="px-2 py-3 text-muted small">Belum ada notifikasi.</div>
         <?php endif; ?>
 
         <?php foreach ($terbaru as $n): ?>
-            <div class="px-3 py-2 border-bottom small <?= $n['status_baca'] ? '' : 'bg-light' ?>">
-                <div><?= esc($n['pesan']) ?></div>
-                <div class="text-muted"><?= esc(date('d M Y H:i', strtotime($n['waktu_kirim']))) ?></div>
-            </div>
+            <!-- Klik: tandai dibaca lalu buka halaman terkait (kartu Notifikasi dan Pengingat Harian) -->
+            <a href="<?= site_url('notifikasi/' . $n['id_notifikasi'] . '/buka') ?>"
+                class="notif-item <?= $n['status_baca'] ? '' : 'baru' ?>">
+                <span class="notif-titik" aria-hidden="true"></span>
+                <span class="min-w-0 flex-grow-1">
+                    <span class="judul d-block small"><?= esc($n['pesan']) ?></span>
+                    <span class="meta"><?= esc(date('d M Y, H.i', strtotime($n['waktu_kirim']))) ?> WIB</span>
+                </span>
+            </a>
         <?php endforeach; ?>
 
-        <!-- Halaman daftar notifikasi menyusul (UC-18 dan UC-32) -->
-        <div class="px-3 py-2 text-center small text-muted">Lihat semua (segera)</div>
+        <a href="<?= site_url('notifikasi') ?>" class="d-block pt-2 pb-1 text-center small fw-medium">Lihat semua notifikasi</a>
     </div>
 </div>
