@@ -168,7 +168,7 @@ class Survei extends BaseController
         }
 
         $kamar = model(KamarModel::class)->find($survei['id_kamar']);
-        $info  = model(InfoKosModel::class)->first();
+        $info  = model(InfoKosModel::class)->ambil();
 
         $jam   = substr($survei['waktu_survei'], 0, 5);
         $pesan = 'Halo, saya ' . $survei['nama_calon'] . ' ingin survei Kamar ' . $kamar['nomor_kamar']
@@ -182,7 +182,7 @@ class Survei extends BaseController
             'foto'   => $this->fotoUtama((int) $kamar['id_kamar']),
             'jam'    => $jam,
             'pesan'  => $pesan,
-            'waLink' => $info ? wa_link($info['no_whatsapp'], $pesan) : null,
+            'waLink' => $info['no_whatsapp'] !== '' ? wa_link($info['no_whatsapp'], $pesan) : null,
         ]);
     }
 

@@ -45,6 +45,18 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     // Tagihan (Kartu 3): seluruh tagihan dengan filter belum lunas dan lewat jatuh tempo
     $routes->get('tagihan', 'Pemilik\Tagihan::index');
 
+    // Info kos dan tarif (tabel info_kos hanya satu baris, jadi hanya ubah)
+    $routes->get('info-kos', 'Pemilik\InfoKos::index');
+    $routes->post('info-kos/simpan', 'Pemilik\InfoKos::simpan');
+
+    // Kelola pengumuman dan peraturan
+    $routes->get('pengumuman', 'Pemilik\Pengumuman::index');
+    $routes->get('pengumuman/tambah', 'Pemilik\Pengumuman::tambah');
+    $routes->post('pengumuman/simpan', 'Pemilik\Pengumuman::simpan');
+    $routes->get('pengumuman/(:num)/ubah', 'Pemilik\Pengumuman::ubah/$1');
+    $routes->post('pengumuman/(:num)/perbarui', 'Pemilik\Pengumuman::perbarui/$1');
+    $routes->post('pengumuman/(:num)/hapus', 'Pemilik\Pengumuman::hapus/$1');
+
     // Kartu 8: persetujuan pemesanan
     $routes->get('pemesanan', 'Pemesanan::daftar');
     $routes->post('pemesanan/(:num)/setujui', 'Pemesanan::setujui/$1');
@@ -70,18 +82,6 @@ $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($rou
     // Masa sewa (Kartu 4 Sprint 4)
     $routes->get('sewa', 'Penghuni\Sewa::index');
 });
-
-// Notifikasi untuk semua peran yang sudah login (kartu Notifikasi dan Pengingat Harian)
-$routes->group('notifikasi', ['filter' => 'peran'], static function ($routes) {
-    $routes->get('/', 'Notifikasi::index');
-    $routes->get('(:num)/buka', 'Notifikasi::buka/$1');
-    $routes->post('baca-semua', 'Notifikasi::bacaSemua');
-});
-
-// Callback Midtrans (kartu pembayaran QRIS). Dipanggil server Midtrans, jadi TANPA filter login
-// dan dikecualikan dari CSRF di Config/Filters.php. Keamanannya lewat cek signature.
-$routes->post('pembayaran/callback', 'PaymentCallback::index');
-$routes->post('pembayaran/callback-duitku', 'DuitkuCallback::index');
 
 // Katalog publik (Kartu 7). Bisa dibuka tanpa login, jadi tanpa filter.
 $routes->get('katalog', 'Katalog::index');

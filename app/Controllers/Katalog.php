@@ -78,10 +78,18 @@ class Katalog extends BaseController
             'media'     => $media,
             'fasilitas' => daftar_fasilitas($kamar['fasilitas']),
             'peraturan' => model(PengumumanModel::class)->peraturan(),
-            'info'      => model(InfoKosModel::class)->first(),
+            'info'      => $this->infoKos(),
             'harga'     => $harga,
             'dp'        => $dp,
             'sisa'      => $harga - $dp,
         ]);
+    }
+
+    /** Info kos untuk tampilan publik; null bila pemilik belum mengisinya. */
+    private function infoKos(): ?array
+    {
+        $info = model(InfoKosModel::class)->ambil();
+
+        return $info['id_info'] === null ? null : $info;
     }
 }
