@@ -166,7 +166,7 @@ CREATE TABLE tagihan (
   jenis_tagihan       ENUM('dp','pelunasan','listrik_air','denda_piket','menginap_pengunjung') NOT NULL,
   jumlah_tagihan      DECIMAL(12,2) NOT NULL,
   tanggal_jatuh_tempo DATE          NOT NULL,
-  status_tagihan      ENUM('belum_bayar','lunas') NOT NULL DEFAULT 'belum_bayar',
+  status_tagihan      ENUM('belum_bayar','lunas','batal') NOT NULL DEFAULT 'belum_bayar',
   PRIMARY KEY (id_tagihan),
   CONSTRAINT chk_tagihan_jumlah CHECK (jumlah_tagihan > 0),
   KEY idx_tagihan_sewa (id_sewa),

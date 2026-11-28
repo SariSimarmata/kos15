@@ -87,6 +87,13 @@ $hariIni = new DateTime('today', $zona);
                 </div>
             </div>
         <?php endif; ?>
+                <?php if ($utama['status_sewa'] === 'aktif' && ! empty($utama['id_sewa'])): ?>
+            <form method="post" action="<?= site_url('penghuni/sewa/' . $utama['id_sewa'] . '/perpanjangan') ?>"
+                  onsubmit="return confirm('Ajukan perpanjangan sewa selama satu tahun?');">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-primary">Ajukan Perpanjangan</button>
+            </form>
+        <?php endif; ?>
     </div>
 
     <?php if (count($riwayat) > 1): ?>

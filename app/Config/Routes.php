@@ -65,6 +65,12 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     $routes->get('pemesanan', 'Pemesanan::daftar');
     $routes->post('pemesanan/(:num)/setujui', 'Pemesanan::setujui/$1');
     $routes->post('pemesanan/(:num)/tolak', 'Pemesanan::tolak/$1');
+
+    // Kartu 11: perpanjangan dan pembatalan sewa
+    $routes->post('perpanjangan/(:num)/setujui', 'Pemilik\Perpanjangan::setujui/$1');
+    $routes->post('perpanjangan/(:num)/tolak', 'Pemilik\Perpanjangan::tolak/$1');
+    $routes->post('sewa/(:num)/batalkan', 'Pemilik\Perpanjangan::batalkan/$1');
+        $routes->get('perpanjangan', 'Pemilik\DaftarPerpanjangan::index');
 });
 
 // Penghuni
@@ -85,6 +91,9 @@ $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($rou
 
     // Masa sewa (Kartu 4 Sprint 4)
     $routes->get('sewa', 'Penghuni\Sewa::index');
+
+    // Kartu 11: ajukan perpanjangan sewa
+    $routes->post('sewa/(:num)/perpanjangan', 'Penghuni\Perpanjangan::ajukan/$1');
 });
 
 // Katalog publik (Kartu 7). Bisa dibuka tanpa login, jadi tanpa filter.
