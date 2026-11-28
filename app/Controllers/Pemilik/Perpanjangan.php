@@ -116,7 +116,15 @@ class Perpanjangan extends BaseController
 
         $db->table('sewa')->where('id_sewa', $idSewa)->update(['status_sewa' => 'batal']);
         $db->table('tagihan')->where('id_sewa', $idSewa)->where('status_tagihan', 'belum_bayar')->update(['status_tagihan' => 'batal']);
-        $db->table('kamar')->where('id_kamar', $sewa->id_kamar)->update(['status_kamar' => 'kosong']);
+        // Kamar hanya dikosongkan kalau tidak ada sewa aktif lain di kamar yang sama
+$masihAktif = (int) $db->query(
+    "SELECT COUNT(*) AS n FROM sewa s JOIN pemesanan p ON p.id_pemesanan = s.id_pemesanan
+      WHERE p.id_kamar = ? AND s.status_sewa = 'aktif' AND s.id_sewa <> ?",
+    [$sewa->id_kamar, $idSewa]
+)->getRow()->n;
+if ($masihAktif === 0) {
+    $db->table('kamar')->where('id_kamar', $sewa->id_kamar)->update(['status_kamar' => 'kosong']);
+}
 
         $db->table('notifikasi')->insert([
             'id_pengguna'      => $sewa->id_pengguna,
