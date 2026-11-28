@@ -96,5 +96,8 @@ $routes->group('pemesanan', ['filter' => 'peran:calon_penghuni'], static functio
     $routes->get('baru', 'Pemesanan::form');
     $routes->get('baru/(:num)', 'Pemesanan::form/$1');
     $routes->post('/', 'Pemesanan::simpan');
-    $routes->get('status', 'Pemesanan::status');
 });
+
+// Status Pengajuan juga boleh dibuka penghuni, supaya pemesanan yang sudah disetujui
+// (dan nomor pemesanannya) tetap bisa dilihat setelah peran berubah menjadi penghuni.
+$routes->get('pemesanan/status', 'Pemesanan::status', ['filter' => 'peran:calon_penghuni,penghuni']);
