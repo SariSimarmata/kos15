@@ -1,23 +1,32 @@
 <?php
 
 use CodeIgniter\Test\CIUnitTestCase;
+use CodeIgniter\Test\DatabaseTestTrait;
 use CodeIgniter\Test\FeatureTestTrait;
+use Tests\Support\AksesUjiTrait;
 
 /**
- * Hak akses halaman info kos dan pengumuman. Filter peran menolak sebelum controller jalan,
- * jadi tes ini tidak menyentuh database.
+ * Hak akses halaman info kos dan pengumuman. Filter peran menolak sebelum controller jalan;
+ * database uji hanya berisi tabel pengguna (lihat AksesUjiTrait).
  *
  * @internal
  */
 final class HakAksesInfoKosTest extends CIUnitTestCase
 {
+    use DatabaseTestTrait;
     use FeatureTestTrait;
+    use AksesUjiTrait;
+
+    // Tanpa migrasi: tabel pengguna dibuat sendiri oleh siapkanAkunUji()
+    protected $migrate = false;
+    protected $refresh = false;
 
     private const HALAMAN_PEMILIK = ['pemilik/info-kos', 'pemilik/pengumuman', 'pemilik/pengumuman/tambah'];
 
-    private function sebagai(string $peran): self
+    protected function setUp(): void
     {
-        return $this->withSession(['logged_in' => true, 'role' => $peran, 'id_pengguna' => 99, 'nama' => 'Uji']);
+        parent::setUp();
+        $this->siapkanAkunUji();
     }
 
     public function testTamuDiarahkanKeLogin(): void

@@ -15,6 +15,7 @@ $grupMenu = [
         'penghuni/sewa'       => ['Masa Sewa', 'bi-calendar-range', []],
         'penghuni/piket'      => ['Piket', 'bi-list-check', []],
         'penghuni/pengunjung' => ['Menginap', 'bi-door-open', []],
+        'penghuni/kerusakan'  => ['Lapor Kerusakan', 'bi-wrench', []],
     ],
 ];
 

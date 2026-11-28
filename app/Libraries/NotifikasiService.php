@@ -229,7 +229,9 @@ class NotifikasiService
                     ? ['pemilik/konfirmasi-tunai', 'pemilik/pembayaran']
                     : ['pemilik/pembayaran', 'pemilik/tagihan'],
                 'perpanjangan' => ['pemilik/perpanjangan', 'pemilik/penghuni'],
-                'aduan'        => ['pemilik/kerusakan'],
+                'aduan'        => $notif['id_laporan'] !== null
+                    ? ['pemilik/kerusakan/' . (int) $notif['id_laporan'], 'pemilik/kerusakan']
+                    : ['pemilik/kerusakan'],
                 'piket'        => ['pemilik/piket'],
                 default        => ['pemilik/tagihan'],      // tagihan, denda, meteran
             },
@@ -237,7 +239,7 @@ class NotifikasiService
                 'tagihan', 'denda', 'pembayaran', 'meteran' => $idTagihan !== null
                     ? ['penghuni/tagihan/' . $idTagihan . '/bayar', 'penghuni/tagihan']
                     : ['penghuni/tagihan'],
-                'aduan'        => ['penghuni/kerusakan'],
+                'aduan'        => ['penghuni/kerusakan/saya', 'penghuni/kerusakan'],
                 'piket'        => ['penghuni/piket'],
                 'perpanjangan' => ['penghuni/sewa'],
                 default        => ['penghuni/tagihan'],      // pemesanan disetujui -> lanjut bayar

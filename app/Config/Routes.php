@@ -57,6 +57,11 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     $routes->post('pengumuman/(:num)/perbarui', 'Pemilik\Pengumuman::perbarui/$1');
     $routes->post('pengumuman/(:num)/hapus', 'Pemilik\Pengumuman::hapus/$1');
 
+    // Kerusakan: pemilik memperbarui status perbaikan (dilaporkan, diproses, selesai)
+    $routes->get('kerusakan', 'Pemilik\Kerusakan::index');
+    $routes->get('kerusakan/(:num)', 'Pemilik\Kerusakan::detail/$1');
+    $routes->post('kerusakan/(:num)/status', 'Pemilik\Kerusakan::ubahStatus/$1');
+
     // Kartu 8: persetujuan pemesanan
     $routes->get('pemesanan', 'Pemesanan::daftar');
     $routes->post('pemesanan/(:num)/setujui', 'Pemesanan::setujui/$1');
@@ -79,9 +84,18 @@ $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($rou
     $routes->get('riwayat', 'Penghuni\Riwayat::index');                         // menu "Riwayat Pembayaran"
     $routes->get('riwayat/unduh', 'Penghuni\Riwayat::unduhRekap');              // tombol "Unduh Rekap"
 
+    // Laporan kerusakan: laporan bersama (tanpa nama pelapor), laporan saya, dan form laporan
+    $routes->get('kerusakan', 'Penghuni\Kerusakan::index');
+    $routes->get('kerusakan/saya', 'Penghuni\Kerusakan::saya');
+    $routes->get('kerusakan/baru', 'Penghuni\Kerusakan::baru');
+    $routes->post('kerusakan/simpan', 'Penghuni\Kerusakan::simpan');
+
     // Masa sewa (Kartu 4 Sprint 4)
     $routes->get('sewa', 'Penghuni\Sewa::index');
 });
+
+// Pengumuman dan peraturan: dibaca penghuni dan calon penghuni (pemilik mengelolanya di /pemilik/pengumuman)
+$routes->get('pengumuman', 'Pengumuman::index', ['filter' => 'peran:penghuni,calon_penghuni']);
 
 // Katalog publik (Kartu 7). Bisa dibuka tanpa login, jadi tanpa filter.
 $routes->get('katalog', 'Katalog::index');
@@ -89,6 +103,17 @@ $routes->get('katalog/(:num)', 'Katalog::detail/$1');
 $routes->get('katalog/(:num)/survei', 'Survei::form/$1');
 $routes->post('katalog/(:num)/survei', 'Survei::simpan/$1');
 $routes->get('katalog/survei/(:num)', 'Survei::konfirmasi/$1');
+// Notifikasi untuk semua peran yang sudah login (kartu Notifikasi dan Pengingat Harian)
+$routes->group('notifikasi', ['filter' => 'peran'], static function ($routes) {
+    $routes->get('/', 'Notifikasi::index');
+    $routes->get('(:num)/buka', 'Notifikasi::buka/$1');
+    $routes->post('baca-semua', 'Notifikasi::bacaSemua');
+});
+
+// Callback Midtrans (kartu pembayaran QRIS). Dipanggil server Midtrans, jadi TANPA filter login
+// dan dikecualikan dari CSRF di Config/Filters.php. Keamanannya lewat cek signature.
+$routes->post('pembayaran/callback', 'PaymentCallback::index');
+$routes->post('pembayaran/callback-duitku', 'DuitkuCallback::index');
 
 // Fitur calon penghuni yang wajib login (pesan kamar, pantau pengajuan)
 // Kartu 8: /pemesanan/baru/{id_kamar} dipakai tombol "Pesan" di katalog (Kartu 7)

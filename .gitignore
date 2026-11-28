@@ -128,3 +128,7 @@ _modules/*
 # Foto kamar hasil unggahan (Kartu 6), jangan ikut di-commit
 public/uploads/kamar/*
 !public/uploads/kamar/.gitkeep
+
+# Foto laporan kerusakan hasil unggahan, jangan ikut di-commit
+public/uploads/kerusakan/*
+!public/uploads/kerusakan/.gitkeep

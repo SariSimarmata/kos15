@@ -390,7 +390,7 @@ Semua halaman penghuni memakai `layouts/penghuni`.
 Setelah tagihan DP dan pelunasan lunas, status sewa berubah dari `menunggu_pembayaran` menjadi `aktif` (`PembayaranService`).
 Gaya halaman ini ada di bagian akhir `public/css/kos15.css` (kelas baru saja, gaya lama tidak diubah).
 
-## 12. Info Kos, Tarif, dan Pengumuman
+## 13. Info Kos, Tarif, dan Pengumuman
 
 Tabel `info_kos` **hanya berisi satu baris**. Kartu lain mengambil tarif lewat satu method ini, jangan `first()` atau `insert()` sendiri:
 
@@ -418,3 +418,23 @@ Bila tabel kosong, `ambil()` mengembalikan nilai bawaan (`id_info` = `null`) tan
 **Aturan validasi:** tarif tidak boleh negatif (nol boleh, maksimal 9.999.999.999); nomor WhatsApp diawali `08` atau `628` (spasi, strip, dan `+` dibuang otomatis); jadwal pengingat berisi 1 sampai 5 angka hari (1 sampai 30), disimpan urut turun tanpa duplikat; batas menginap 1 sampai 7 hari per minggu. Isi pengumuman 5 sampai 2000 karakter. Tanggal terbit diisi otomatis (WIB) dan tidak berubah saat diubah.
 
 Tes: `vendor/bin/phpunit tests/unit/InfoKosAturanTest.php tests/feature/HakAksesInfoKosTest.php`
+
+---
+
+## 14. Laporan Kerusakan
+
+| Halaman | Alamat | Siapa |
+| --- | --- | --- |
+| Laporan bersama (hanya baca, **tanpa nama pelapor**) | `/penghuni/kerusakan` | penghuni |
+| Laporan saya | `/penghuni/kerusakan/saya` | penghuni |
+| Form laporan (deskripsi + foto) | `/penghuni/kerusakan/baru` | penghuni |
+| Daftar kerusakan dan filter status | `/pemilik/kerusakan` | pemilik |
+| Detail dan ubah status | `/pemilik/kerusakan/{id}` | pemilik |
+
+- **Kamar tidak diisi di form.** Pelapor dan kamar diambil server dari akun yang login dan sewanya yang berstatus `aktif` (`LaporanKerusakanModel::kamarAktif()`). Penghuni tanpa sewa aktif tidak bisa melapor. Tabel `laporan_kerusakan` tidak punya kolom kamar, jadi di halaman pemilik kamar dicari dari sewa aktif pelapor (kosong bila sewanya sudah berakhir).
+- **Halaman bersama tidak mengambil kolom pelapor.** `bersama()` dan `milikPengguna()` memilih kolom satu per satu dan tidak memuat `id_pengguna`. Jangan menambahkannya, dan jangan menampilkan nomor kamar di halaman bersama (satu kamar satu penghuni, jadi nomornya membuka identitas).
+- **Foto:** JPG, PNG, atau WEBP, maksimal 2 MB. Tipe dibaca dari isi file (bukan dari nama), isinya harus benar-benar gambar, dan file disimpan dengan **nama acak** di `public/uploads/kerusakan/` (database hanya menyimpan nama file; folder ini tidak di-commit).
+- **Status** hanya maju satu langkah: `dilaporkan` lalu `diproses` lalu `selesai`. Catatan perbaikan wajib saat `selesai`, foto perbaikan opsional. `tanggal_selesai` diisi otomatis (WIB).
+- **Notifikasi:** laporan baru memberi notifikasi `aduan` ke pemilik (`NotifikasiService::laporanKerusakan()`), dan setiap perubahan status memberi notifikasi `aduan` ke penghuni pelapor. Klik notifikasi membuka laporan terkait.
+
+Tes: `vendor/bin/phpunit tests/unit/KerusakanAturanTest.php tests/feature/HakAksesKerusakanTest.php`
