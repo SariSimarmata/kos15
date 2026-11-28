@@ -47,17 +47,70 @@ class PembayaranModel extends Model
             . '-' . strtoupper(bin2hex(random_bytes(3)));
     }
 
-    /** Pembayaran lengkap dengan tagihan dan pemilik tagihan (id_pengguna penghuni). */
+    /**
+     * Pembayaran lengkap dengan tagihan dan pemilik tagihan (id_pengguna penghuni).
+     * Untuk Kwitansi ikut: nama_konfirmator (null untuk QRIS) dan kolom periode (dipakai TagihanModel::periode()).
+     */
     public function detailLengkap(int $idPembayaran): ?array
     {
         return $this->select('pembayaran.*, tagihan.jenis_tagihan, tagihan.jumlah_tagihan, '
-                . 'tagihan.tanggal_jatuh_tempo, tagihan.status_tagihan, pemesanan.id_pengguna, kamar.nomor_kamar')
+                . 'tagihan.tanggal_jatuh_tempo, tagihan.status_tagihan, pemesanan.id_pengguna, kamar.nomor_kamar, '
+                . 'sewa.tanggal_mulai, sewa.tanggal_berakhir, tagihan_bulanan.periode, piket.tanggal_piket, '
+                . 'konfirmator.nama AS nama_konfirmator')
             ->join('tagihan', 'tagihan.id_tagihan = pembayaran.id_tagihan')
             ->join('sewa', 'sewa.id_sewa = tagihan.id_sewa')
             ->join('pemesanan', 'pemesanan.id_pemesanan = sewa.id_pemesanan')
             ->join('kamar', 'kamar.id_kamar = pemesanan.id_kamar')
+            ->join('tagihan_bulanan', 'tagihan_bulanan.id_tagihan = tagihan.id_tagihan', 'left')
+            ->join('piket', 'piket.id_tagihan = tagihan.id_tagihan', 'left')
+            ->join('pengguna konfirmator', 'konfirmator.id_pengguna = pembayaran.id_konfirmator', 'left')
             ->where('pembayaran.id_pembayaran', $idPembayaran)
             ->first();
+    }
+
+    // ------------------------------------------------------------------
+    //  Pembayaran tunai (Kartu 6)
+    // ------------------------------------------------------------------
+
+    /** Pengajuan tunai yang masih menunggu konfirmasi untuk satu tagihan, atau null. */
+    public function tunaiMenunggu(int $idTagihan): ?array
+    {
+        return $this->where('id_tagihan', $idTagihan)
+            ->where('metode', 'tunai')
+            ->where('status_pembayaran', 'menunggu')
+            ->orderBy('id_pembayaran', 'DESC')
+            ->first();
+    }
+
+    /**
+     * Semua pengajuan tunai yang menunggu konfirmasi, yang paling lama di atas.
+     * Kolom periode, tanggal_mulai, tanggal_berakhir, tanggal_piket dipakai TagihanModel::periode().
+     */
+    public function daftarTunaiMenunggu(): array
+    {
+        return $this->select('pembayaran.*, tagihan.jenis_tagihan, tagihan.tanggal_jatuh_tempo, kamar.nomor_kamar, '
+                . 'penghuni.nama AS nama_penghuni, penghuni.username, '
+                . 'sewa.tanggal_mulai, sewa.tanggal_berakhir, tagihan_bulanan.periode, piket.tanggal_piket')
+            ->join('tagihan', 'tagihan.id_tagihan = pembayaran.id_tagihan')
+            ->join('sewa', 'sewa.id_sewa = tagihan.id_sewa')
+            ->join('pemesanan', 'pemesanan.id_pemesanan = sewa.id_pemesanan')
+            ->join('kamar', 'kamar.id_kamar = pemesanan.id_kamar')
+            ->join('pengguna penghuni', 'penghuni.id_pengguna = pemesanan.id_pengguna')
+            ->join('tagihan_bulanan', 'tagihan_bulanan.id_tagihan = tagihan.id_tagihan', 'left')
+            ->join('piket', 'piket.id_tagihan = tagihan.id_tagihan', 'left')
+            ->where('pembayaran.metode', 'tunai')
+            ->where('pembayaran.status_pembayaran', 'menunggu')
+            ->orderBy('pembayaran.tanggal_bayar', 'ASC')
+            ->orderBy('pembayaran.id_pembayaran', 'ASC')
+            ->findAll();
+    }
+
+    /** Jumlah pengajuan tunai yang menunggu, untuk angka di sidebar pemilik. */
+    public function jumlahTunaiMenunggu(): int
+    {
+        return $this->where('metode', 'tunai')
+            ->where('status_pembayaran', 'menunggu')
+            ->countAllResults();
     }
 
     /**

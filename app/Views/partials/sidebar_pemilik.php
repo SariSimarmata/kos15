@@ -35,12 +35,13 @@ $grupMenu = [
 ];
 
 // Angka di samping menu: jumlah yang menunggu tindakan pemilik.
-// Baru Pemesanan Kamar yang datanya sudah ada (Kartu 8).
+// Baru Pemesanan Kamar (Kartu 8) dan Konfirmasi Tunai (Kartu 6) yang datanya sudah ada.
 $angkaMenu = [];
 try {
     $angkaMenu['pemilik/pemesanan'] = db_connect()->table('pemesanan')
         ->where('status_pengajuan', 'pending')
         ->countAllResults();
+    $angkaMenu['pemilik/konfirmasi-tunai'] = model(\App\Models\PembayaranModel::class)->jumlahTunaiMenunggu();
 } catch (\Throwable $e) {
     // Sidebar tidak boleh membuat halaman gagal tampil
     log_message('error', 'Sidebar pemilik: ' . $e->getMessage());

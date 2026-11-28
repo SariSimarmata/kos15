@@ -45,6 +45,11 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     // Tagihan (Kartu 3): seluruh tagihan dengan filter belum lunas dan lewat jatuh tempo
     $routes->get('tagihan', 'Pemilik\Tagihan::index');
 
+    // Konfirmasi pembayaran tunai (Kartu 6). URL sama dengan menu "Konfirmasi Tunai" di partials/sidebar_pemilik.php
+    $routes->get('konfirmasi-tunai', 'Pemilik\KonfirmasiTunai::index');
+    $routes->post('konfirmasi-tunai/(:num)/konfirmasi', 'Pemilik\KonfirmasiTunai::konfirmasi/$1');
+    $routes->post('konfirmasi-tunai/(:num)/tolak', 'Pemilik\KonfirmasiTunai::tolak/$1');
+
     // Info kos dan tarif (tabel info_kos hanya satu baris, jadi hanya ubah)
     $routes->get('info-kos', 'Pemilik\InfoKos::index');
     $routes->post('info-kos/simpan', 'Pemilik\InfoKos::simpan');
@@ -73,6 +78,7 @@ $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($rou
     $routes->get('bayar', 'Penghuni\Pembayaran::mulai');                        // menu "Bayar Tagihan"
     $routes->get('tagihan/(:num)/bayar', 'Penghuni\Pembayaran::pilih/$1');
     $routes->post('tagihan/(:num)/qris', 'Penghuni\Pembayaran::buatQris/$1');
+    $routes->post('tagihan/(:num)/tunai', 'Penghuni\PembayaranTunai::ajukan/$1');   // Kartu 6: ajukan bayar tunai
     $routes->get('pembayaran/(:num)', 'Penghuni\Pembayaran::qris/$1');
     $routes->get('pembayaran/(:num)/status', 'Penghuni\Pembayaran::status/$1'); // JSON untuk polling
     $routes->get('pembayaran/(:num)/kwitansi', 'Penghuni\Riwayat::kwitansi/$1');
