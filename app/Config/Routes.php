@@ -66,6 +66,7 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     $routes->post('perpanjangan/(:num)/setujui', 'Pemilik\Perpanjangan::setujui/$1');
     $routes->post('perpanjangan/(:num)/tolak', 'Pemilik\Perpanjangan::tolak/$1');
     $routes->post('sewa/(:num)/batalkan', 'Pemilik\Perpanjangan::batalkan/$1');
+        $routes->get('perpanjangan', 'Pemilik\DaftarPerpanjangan::index');
 });
 
 // Penghuni
