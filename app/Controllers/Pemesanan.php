@@ -41,7 +41,7 @@ class Pemesanan extends BaseController
         $infoKamarTerisi = null;
 
         // Kamar dari katalog yang ternyata sudah terisi: beri tahu, jangan diam-diam diganti
-        if ($idKamar !== null && !in_array($terpilih, array_column($kamarKosong, 'id_kamar'), true)) {
+        if ($idKamar !== null && !in_array($terpilih, array_map('intval', array_column($kamarKosong, 'id_kamar')), true)) {
             $kamar = model(KamarModel::class)->find($terpilih);
             $infoKamarTerisi = $kamar
                 ? 'Kamar ' . $kamar['nomor_kamar'] . ' sudah terisi. Silakan pilih kamar lain yang masih kosong.'
@@ -99,8 +99,8 @@ class Pemesanan extends BaseController
         if ($sudahPending !== null) {
             return redirect()->to('pemesanan/status')->with(
                 'gagal',
-                'Kamu masih punya pengajuan ' . PemesananModel::nomor((int) $sudahPending['id_pemesanan'])
-                . ' yang menunggu keputusan pemilik. Tunggu hasilnya sebelum memesan kamar lain.'
+                'Kamu masih punya pengajuan yang menunggu keputusan pemilik. '
+                . 'Tunggu hasilnya sebelum memesan kamar lain.'
             );
         }
 
@@ -150,25 +150,15 @@ class Pemesanan extends BaseController
 
         return redirect()->to('pemesanan/status')->with(
             'sukses',
-            'Pemesanan ' . $nomor . ' untuk kamar ' . $kamar['nomor_kamar'] . ' sudah dikirim. Pemilik akan memeriksanya.'
+            'Pemesanan kamar ' . $kamar['nomor_kamar'] . ' sudah dikirim. Pemilik akan memeriksanya. '
+            . 'Nomor pemesanan terbit setelah pemesanan disetujui.'
         );
     }
 
-    /** Status Pengajuan: pending, approved, atau rejected, lengkap dengan nomor pemesanan. */
+    /** Status Pengajuan: pending, approved, atau rejected. Nomor pemesanan tampil hanya jika approved. */
     public function status()
     {
         $idPengguna = (int) session('id_pengguna');
-
-        // Peran bisa sudah berubah menjadi penghuni setelah pemilik menyetujui,
-        // sementara session masih menyimpan peran lama.
-        $pengguna = model(PenggunaModel::class)->find($idPengguna);
-        if ($pengguna !== null && $pengguna['role'] !== session('role')) {
-            session()->set('role', $pengguna['role']);
-            if ($pengguna['role'] === 'penghuni') {
-                return redirect()->to('penghuni/tagihan')
-                    ->with('sukses', 'Pemesananmu disetujui. Kamu sekarang terdaftar sebagai penghuni.');
-            }
-        }
 
         return view('pemesanan/status', [
             'judul'      => 'Status Pengajuan',
@@ -332,7 +322,7 @@ class Pemesanan extends BaseController
 
             $this->kirimNotifikasi(
                 (int) $pemesanan['id_pengguna'],
-                'Pemesanan ' . $nomor . ' untuk kamar ' . ($kamar['nomor_kamar'] ?? '-') . ' ditolak oleh pemilik. '
+                'Pemesanan kamar ' . ($kamar['nomor_kamar'] ?? '-') . ' ditolak oleh pemilik. '
                 . 'Kamu bisa memesan kamar lain yang masih kosong.'
             );
 

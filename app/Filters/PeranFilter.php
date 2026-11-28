@@ -2,6 +2,8 @@
 
 namespace App\Filters;
 
+use App\Controllers\Auth;
+use App\Models\PenggunaModel;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -29,6 +31,25 @@ class PeranFilter implements FilterInterface
 
             return redirect()->to(site_url('login'))
                 ->with('gagal', 'Silakan masuk terlebih dahulu.');
+        }
+
+        // Peran di session bisa sudah usang, misalnya calon penghuni yang baru disetujui pemilik
+        // (peran di database sudah penghuni). Samakan dulu dengan database, lalu arahkan ke
+        // halaman utama peran barunya supaya tidak kena halaman 403.
+        $pengguna = model(PenggunaModel::class)->find((int) $session->get('id_pengguna'));
+        if ($pengguna === null) {
+            $session->destroy();
+
+            return redirect()->to(site_url('login'))
+                ->with('gagal', 'Akunmu tidak ditemukan. Silakan masuk lagi.');
+        }
+        if ($pengguna['role'] !== $session->get('role')) {
+            $session->set('role', $pengguna['role']);
+
+            return redirect()->to(site_url(Auth::TUJUAN[$pengguna['role']] ?? '/'))
+                ->with('sukses', $pengguna['role'] === 'penghuni'
+                    ? 'Pemesananmu disetujui. Kamu sekarang terdaftar sebagai penghuni.'
+                    : 'Peran akunmu sudah diperbarui.');
         }
 
         if (empty($arguments)) {
