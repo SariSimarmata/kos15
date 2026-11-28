@@ -18,7 +18,7 @@ $grupMenu = [
         'pemilik/survei'           => ['Pengajuan Survei', 'bi-eye'],
     ],
     'OPERASIONAL' => [
-        'pemilik/tagihan'          => ['Tagihan Bulanan', 'bi-file-earmark-text'],
+        'pemilik/tagihan'          => ['Tagihan', 'bi-file-earmark-text'],
         'pemilik/piket'            => ['Piket', 'bi-clipboard-check'],
     ],
     'LAPORAN' => [

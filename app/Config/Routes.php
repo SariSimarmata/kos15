@@ -42,6 +42,9 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     $routes->post('penghuni/(:num)/perbarui', 'Pemilik\Penghuni::perbarui/$1');
     $routes->post('penghuni/(:num)/hapus', 'Pemilik\Penghuni::hapus/$1');
 
+    // Tagihan (Kartu 3): seluruh tagihan dengan filter belum lunas dan lewat jatuh tempo
+    $routes->get('tagihan', 'Pemilik\Tagihan::index');
+
     // Kartu 8: persetujuan pemesanan
     $routes->get('pemesanan', 'Pemesanan::daftar');
     $routes->post('pemesanan/(:num)/setujui', 'Pemesanan::setujui/$1');
@@ -50,7 +53,9 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
 
 // Penghuni
 $routes->group('penghuni', ['filter' => 'peran:penghuni'], static function ($routes) {
-    $routes->get('tagihan', 'Sementara::tagihanPenghuni'); // SEMENTARA
+    // Tagihan (Kartu 3): daftar tagihan dan pilihan skema DP 50% / lunas
+    $routes->get('tagihan', 'Penghuni\Tagihan::index');
+    $routes->post('tagihan/skema', 'Penghuni\Tagihan::pilihSkema');
 
     // Masa sewa (Kartu 4 Sprint 4)
     $routes->get('sewa', 'Penghuni\Sewa::index');
