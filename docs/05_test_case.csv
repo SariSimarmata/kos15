@@ -1,0 +1,6 @@
+ID,Skenario,Prasyarat,Langkah,Hasil yang diharapkan,Hasil aktual,Status
+TC-01,Ajukan bayar tunai,Penghuni login; tagihan belum_bayar,Klik "Ajukan bayar tunai" pada tagihan,Pembayaran status menunggu; pemilik menerima notifikasi; tagihan tetap belum_bayar,,
+TC-02,Konfirmasi,Ada pengajuan status menunggu; pemilik login,Klik Konfirmasi,Pembayaran dikonfirmasi; id_konfirmator terisi; tagihan lunas; penghuni menerima notifikasi,,
+TC-03,Tolak,Ada pengajuan status menunggu; pemilik login,Isi alasan lalu klik Tolak,Pembayaran ditolak; id_konfirmator terisi; tagihan belum_bayar; penghuni menerima notifikasi,,
+TC-04,Ajukan ganda,Tagihan sudah punya pengajuan menunggu,Ajukan bayar tunai lagi untuk tagihan yang sama,Ditolak sistem dengan pesan "masih menunggu konfirmasi"; tidak ada baris baru di tabel pembayaran,,
+TC-05,Bukti tampil,Pembayaran berstatus dikonfirmasi,Buka Riwayat lalu klik "Lihat bukti" dan Cetak/Simpan PDF,Bukti menampilkan nama; periode; jumlah; metode; konfirmator; tanggal; status LUNAS,,
