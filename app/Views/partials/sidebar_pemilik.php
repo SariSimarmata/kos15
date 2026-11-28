@@ -19,6 +19,7 @@ $grupMenu = [
     ],
     'OPERASIONAL' => [
         'pemilik/tagihan'          => ['Tagihan', 'bi-file-earmark-text'],
+        'pemilik/meteran'          => ['Input Meteran', 'bi-speedometer2'],
         'pemilik/piket'            => ['Piket', 'bi-clipboard-check'],
     ],
     'LAPORAN' => [

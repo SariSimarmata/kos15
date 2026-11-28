@@ -45,6 +45,10 @@ $routes->group('pemilik', ['filter' => 'peran:pemilik'], static function ($route
     // Tagihan (Kartu 3): seluruh tagihan dengan filter belum lunas dan lewat jatuh tempo
     $routes->get('tagihan', 'Pemilik\Tagihan::index');
 
+    // Input meteran bulanan (Kartu 9): membuat tagihan listrik_air per penghuni
+    $routes->get('meteran', 'Pemilik\Meteran::index');
+    $routes->post('meteran/simpan', 'Pemilik\Meteran::simpan');
+
     // Info kos dan tarif (tabel info_kos hanya satu baris, jadi hanya ubah)
     $routes->get('info-kos', 'Pemilik\InfoKos::index');
     $routes->post('info-kos/simpan', 'Pemilik\InfoKos::simpan');

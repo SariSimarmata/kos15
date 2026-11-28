@@ -20,6 +20,7 @@ class Menu extends BaseConfig
         'pemilik/pemesanan'   => 'Pemesanan',
         'pemilik/penghuni'    => 'Penghuni',
         'pemilik/tagihan'     => 'Tagihan',
+        'pemilik/meteran'     => 'Meteran',
         'pemilik/piket'       => 'Piket',
         'pemilik/kerusakan'   => 'Kerusakan',
         'pemilik/pengumuman'  => 'Pengumuman',
