@@ -12,6 +12,7 @@ class DaftarPerpanjangan extends BaseController
 {
     public function index()
     {
+        helper('tanggal');
         $db = \Config\Database::connect();
 
         $pengajuan = $db->query(
@@ -42,3 +43,4 @@ class DaftarPerpanjangan extends BaseController
         ]);
     }
 }
+
